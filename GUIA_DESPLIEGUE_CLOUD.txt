@@ -1,0 +1,166 @@
+# GUÍA DE DESPLIEGUE EN LA NUBE
+# Sistema de Ficha Médica Ocupacional – CASISO S.A.S.
+# Dr. Martín Lino Zambrano
+
+==========================================================
+PASO 1 — CREAR CUENTA EN GITHUB (repositorio del código)
+==========================================================
+
+1. Ve a: https://github.com
+2. Clic en "Sign up"
+3. Ingresa:
+   - Username: casiso-medica  (o el que prefieras)
+   - Email: tu correo
+   - Password: una contraseña segura
+4. Verifica tu correo
+5. En el dashboard, clic en "New repository" (botón verde)
+6. Nombre del repositorio: ficha-medica-casiso
+7. Selecciona "Private" (privado)
+8. Clic en "Create repository"
+
+— SUBIR LOS ARCHIVOS —
+9.  En la página del repositorio, clic en "uploading an existing file"
+10. Arrastra TODOS los archivos de tu carpeta FichaMedica_CASISO:
+    - app.py
+    - index.html
+    - requirements.txt
+    - Procfile
+    - .gitignore
+    - carpeta plantillas/ (con los 4 archivos .xlsx)
+11. Escribe un mensaje: "Subida inicial del sistema"
+12. Clic en "Commit changes"
+
+✓ Tu código ya está en GitHub
+
+
+==========================================================
+PASO 2 — CREAR BASE DE DATOS EN SUPABASE (matriz persistente)
+==========================================================
+
+1. Ve a: https://supabase.com
+2. Clic en "Start your project"
+3. Inicia sesión con tu cuenta de GitHub (más fácil)
+4. Clic en "New project"
+5. Completa:
+   - Organization: tu nombre o CASISO
+   - Project name: fichas-medicas
+   - Database Password: crea una contraseña fuerte (GUÁRDALA)
+   - Region: South America (São Paulo)
+6. Clic en "Create new project"
+   ⏳ Espera ~2 minutos mientras se crea
+
+— CREAR LA TABLA DE MATRIZ —
+7. En el panel izquierdo, clic en "SQL Editor"
+8. Clic en "New query"
+9. Pega este código SQL y clic en "Run":
+
+   CREATE TABLE matriz_evaluaciones (
+     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+     created_at TIMESTAMPTZ DEFAULT NOW(),
+     data JSONB NOT NULL
+   );
+
+10. Verás "Success. No rows returned"
+
+— OBTENER LAS CREDENCIALES —
+11. En el panel izquierdo, clic en "Settings" (engranaje)
+12. Clic en "API"
+13. Copia y GUARDA estos dos valores:
+    - Project URL: https://xxxxxxxxxxxx.supabase.co
+    - anon public key: eyJhbGciOiJIUzI1NiIsIn... (clave larga)
+
+✓ Base de datos lista
+
+
+==========================================================
+PASO 3 — CREAR CUENTA EN RENDER (servidor en la nube)
+==========================================================
+
+1. Ve a: https://render.com
+2. Clic en "Get Started for Free"
+3. Clic en "Continue with GitHub"
+4. Autoriza que Render acceda a tu GitHub
+5. Verifica tu correo si lo pide
+
+— CREAR EL SERVIDOR —
+6.  En el dashboard, clic en "New +"
+7.  Selecciona "Web Service"
+8.  En "Connect a repository", busca y selecciona:
+    casiso-medica/ficha-medica-casiso
+9.  Clic en "Connect"
+10. Completa la configuración:
+    - Name: ficha-medica-casiso
+    - Region: Oregon (US West) — el más rápido para Ecuador
+    - Branch: main
+    - Runtime: Python 3
+    - Build Command: pip install -r requirements.txt
+    - Start Command: gunicorn app:app
+    - Instance Type: Free
+
+— AGREGAR VARIABLES DE ENTORNO —
+11. Scroll hacia abajo hasta "Environment Variables"
+12. Clic en "Add Environment Variable"
+13. Agrega estas DOS variables (usa los valores que guardaste de Supabase):
+
+    Variable 1:
+    Key:   SUPABASE_URL
+    Value: https://xxxxxxxxxxxx.supabase.co
+
+    Variable 2:
+    Key:   SUPABASE_KEY
+    Value: eyJhbGciOiJIUzI1NiIsIn... (la clave anon)
+
+14. Clic en "Create Web Service"
+    ⏳ Espera ~5 minutos mientras Render instala todo
+
+— OBTENER TU ENLACE —
+15. Cuando diga "Your service is live", verás tu URL:
+    https://ficha-medica-casiso.onrender.com
+
+✓ ¡Sistema en línea!
+
+
+==========================================================
+PASO 4 — COMPARTIR CON COLEGAS
+==========================================================
+
+Simplemente comparte el enlace:
+https://ficha-medica-casiso.onrender.com
+
+Cualquier persona con ese enlace puede:
+- Llenar fichas médicas
+- Descargar el Excel con formato oficial
+- Agregar trabajadores a la matriz compartida
+- Descargar la matriz acumulada
+
+NOTA IMPORTANTE — Tiempo de espera inicial:
+El plan gratuito de Render "duerme" después de 15 minutos
+sin uso. La primera visita después de dormir puede tardar
+~30 segundos en cargar. Luego funciona con normalidad.
+
+Para evitar esto, puedes actualizar a Render Starter ($7/mes)
+y el servicio estará siempre activo.
+
+
+==========================================================
+PASO 5 — ACTUALIZAR EL SISTEMA (cuando haya mejoras)
+==========================================================
+
+1. Modifica los archivos en tu computadora
+2. Ve a tu repositorio en GitHub
+3. Abre el archivo → clic en el ícono de lápiz → edita → Commit
+   O arrastra el archivo actualizado y reemplázalo
+4. Render detecta el cambio automáticamente y vuelve a desplegar
+   ⏳ En ~3 minutos la actualización está en línea
+
+==========================================================
+RESUMEN DE CUENTAS CREADAS
+==========================================================
+
+GitHub:   https://github.com/casiso-medica
+Supabase: https://supabase.com (proyecto: fichas-medicas)
+Render:   https://render.com   (servicio: ficha-medica-casiso)
+
+Tu enlace final: https://ficha-medica-casiso.onrender.com
+
+TODO GRATUITO ✓
