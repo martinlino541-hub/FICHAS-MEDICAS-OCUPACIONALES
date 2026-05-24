@@ -1,0 +1,1562 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="theme-color" content="#1556a0"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="FichaOcup"/>
+<link rel="manifest" href="/manifest.json"/>
+<link rel="apple-touch-icon" href="/icon-192.png"/>
+<link rel="icon" href="/favicon.ico"/>
+<title>Ficha Médica Ocupacional – CASISO S.A.S.</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Segoe UI,Arial,sans-serif;font-size:13px;background:#f0f4f8;color:#1a2a3a}
+.hdr{background:linear-gradient(135deg,#0a2d5a,#1556a0);color:#fff;padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
+.hdr-title{font-size:15px;font-weight:700;letter-spacing:.3px}
+.hdr-sub{font-size:10px;color:#a8c8ef;margin-top:2px}
+.hdr-right{display:flex;gap:8px;align-items:center}
+.badge{background:#1a4a80;color:#c8dfef;font-size:11px;padding:4px 10px;border-radius:20px;font-weight:600}
+.btn-hdr{font-size:11px;padding:5px 12px;border-radius:5px;border:none;cursor:pointer;font-weight:600}
+.btn-g{background:#1a7a3a;color:#fff} .btn-g:hover{background:#155f2d} .btn-g:disabled{opacity:.4;cursor:default}
+.btn-r{background:#7a1a1a;color:#fff} .btn-r:hover{background:#5a1414} .btn-r:disabled{opacity:.4;cursor:default}
+.steps-wrap{background:#fff;border-bottom:2px solid #d0dcea;overflow-x:auto}
+.steps{display:flex;min-width:max-content}
+.step-btn{padding:9px 15px;font-size:11px;font-weight:600;border:none;border-bottom:3px solid transparent;background:transparent;cursor:pointer;color:#6a8aaa;white-space:nowrap;display:flex;align-items:center;gap:5px}
+.step-btn.active{border-bottom-color:#1556a0;color:#1556a0;background:#f0f6ff}
+.step-btn:hover:not(.active){background:#f5f8fc;color:#1556a0}
+.sn{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;font-size:10px;background:#d0dcea;color:#1a2a3a;flex-shrink:0}
+.step-btn.active .sn{background:#1556a0;color:#fff}
+.msg-bar{padding:8px 20px;font-size:12px;font-weight:500;display:none;border-left:4px solid #1e7a3a;background:#e8f5ee;color:#1e5530}
+.msg-bar.warn{border-left-color:#c17a00;background:#fff8e8;color:#6a4a00}
+.msg-bar.err{border-left-color:#a01a1a;background:#fceaea;color:#701010}
+.main{max-width:1000px;margin:0 auto;padding:14px}
+.card{background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:10px;overflow:hidden}
+.sec{background:#1556a0;color:#fff;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:7px 14px}
+.sec.sub{background:#2a6abf}.sec.pink{background:#8a3060}.sec.teal{background:#0a6a6a}.sec.gray{background:#3a4a5a}
+.sb{padding:12px 14px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px}
+.c2{grid-column:span 2}.c3{grid-column:span 3}.c4{grid-column:span 4}
+.fld{display:flex;flex-direction:column;gap:3px}
+.fld label{font-size:10px;font-weight:700;color:#5a7a9a;text-transform:uppercase;letter-spacing:.3px}
+.fld input,.fld select,.fld textarea{border:1.5px solid #c8d8e8;border-radius:4px;padding:5px 8px;font-size:12px;font-family:inherit;background:#fff;color:#1a2a3a;outline:none;width:100%;transition:border .12s}
+.fld input:focus,.fld select:focus,.fld textarea:focus{border-color:#1556a0;box-shadow:0 0 0 2px rgba(21,86,160,.12)}
+.fld input[readonly]{background:#f0f4f8;color:#1556a0;font-weight:700}
+.fld textarea{resize:vertical;min-height:55px}
+.imc-badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;margin-top:5px}
+.chk-g{display:flex;flex-wrap:wrap;gap:10px;padding:5px 0}
+.chi{display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer}
+.chi input{width:13px;height:13px;accent-color:#1556a0;flex-shrink:0}
+.sub-lbl{font-size:11px;font-weight:700;color:#1556a0;text-transform:uppercase;letter-spacing:.3px;margin-top:10px;margin-bottom:5px;padding-bottom:3px;border-bottom:1.5px solid #d0dcea}
+.tbl{width:100%;border-collapse:collapse;font-size:11px}
+.tbl th{background:#e8eef8;color:#1556a0;font-weight:700;padding:5px 7px;text-align:left;border:1px solid #c8d8e8;font-size:10px;text-transform:uppercase}
+.tbl td{border:1px solid #d8e4f0;padding:3px 5px;vertical-align:middle}
+.tbl td input{border:none;width:100%;font-size:11px;background:transparent;outline:none;padding:2px 4px;color:#1a2a3a}
+.tbl tr:nth-child(even) td{background:#f8fafd}
+.tbl td.cat{font-weight:700;font-size:10px;color:#1556a0;vertical-align:top;padding-top:6px;background:#f0f6ff;white-space:nowrap}
+.apt-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.apt-opt{display:flex;align-items:center;gap:8px;padding:9px 12px;border:2px solid #c8d8e8;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;transition:all .12s}
+.apt-opt:hover{border-color:#1556a0}
+.apt-APTO{border-color:#1e7a3a;background:#eaf6ee;color:#1e5530}
+.apt-APTO_OBS{border-color:#c17a00;background:#fff8e8;color:#7a4a00}
+.apt-APTO_LIM{border-color:#c15000;background:#fff3ec;color:#7a3000}
+.apt-NO_APTO{border-color:#a01a1a;background:#fceaea;color:#701010}
+.dl-box{background:#f0f6ff;border:2px dashed #90b0d8;border-radius:8px;padding:14px;margin-top:12px}
+.dl-title{font-size:12px;font-weight:700;color:#1556a0;text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px}
+.dl-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.btn-dl{padding:9px 12px;border-radius:5px;border:none;cursor:pointer;font-size:12px;font-weight:700;width:100%;transition:all .12s}
+.btn-dl:disabled{opacity:.5;cursor:default}
+.btn-ficha{background:#1556a0;color:#fff}.btn-ficha:hover:not(:disabled){background:#0e3d78}
+.btn-cert{background:#1e7a3a;color:#fff}.btn-cert:hover:not(:disabled){background:#155a2a}
+.btn-mat{background:#5a1a8a;color:#fff;width:100%;padding:9px;border-radius:5px;border:none;cursor:pointer;font-size:12px;font-weight:700;margin-bottom:7px}
+.btn-mat:hover{background:#40137a}
+.btn-nuevo{background:#fff;color:#3a5a7a;border:1.5px solid #c8d8e8;width:100%;padding:7px;border-radius:5px;cursor:pointer;font-size:12px;font-weight:600}
+.nav-bar{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding:10px 14px;background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.btn-nav{font-size:12px;padding:7px 20px;border-radius:5px;border:1.5px solid #c8d8e8;cursor:pointer;background:#fff;color:#3a5a7a;font-weight:600}
+.btn-nav:disabled{opacity:.35;cursor:default}
+.btn-nav.primary{background:#1556a0;color:#fff;border-color:#1556a0}
+.btn-nav.primary:hover:not(:disabled){background:#0e3d78}
+.step-info{font-size:11px;color:#6a8aaa;font-weight:600}
+.add-btn{font-size:11px;color:#1556a0;background:none;border:none;cursor:pointer;padding:3px 0;font-weight:600;text-decoration:underline;text-underline-offset:2px;margin-top:5px}
+.rm-btn{background:none;border:none;cursor:pointer;color:#a01a1a;font-size:15px;font-weight:700;padding:0 3px}
+.note{font-size:11px;color:#5a7a9a;padding:5px 9px;background:#f0f6ff;border-radius:4px;border-left:3px solid #90b0d8;margin-bottom:7px}
+.lab-row{border:1px solid #d8e4f0;border-radius:5px;padding:8px;margin-bottom:7px;background:#f8fafd}
+.ic{display:flex;flex-wrap:wrap;gap:8px;margin-top:5px}
+.ic label{display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer}
+.mat-panel{background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.08);padding:12px;margin-bottom:10px;border-left:4px solid #5a1a8a}
+.mat-title{font-size:12px;font-weight:700;color:#5a1a8a;margin-bottom:3px}
+.mat-sub{font-size:11px;color:#6a5a8a}
+.dash-card{background:#fff;border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.10);padding:14px}
+.dash-card-title{font-size:13px;font-weight:700;color:#1556a0;margin-bottom:10px}
+.kpi-card{background:#fff;border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.10);padding:12px;text-align:center}
+.kpi-val{font-size:28px;font-weight:800;color:#1556a0}
+.kpi-lbl{font-size:11px;color:#666;margin-top:2px}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:5px}
+.btn-borrador{background:#0e7a5a;color:#fff;width:100%;padding:9px;border-radius:5px;border:none;cursor:pointer;font-size:12px;font-weight:700;margin-bottom:7px}
+.btn-borrador:hover:not(:disabled){background:#0a5c43}
+.btn-eliminar-borrador{background:#c0392b;color:#fff;width:100%;padding:9px;border-radius:5px;border:none;cursor:pointer;font-size:12px;font-weight:700;margin-bottom:7px;display:none}
+.btn-eliminar-borrador:hover{background:#922b21}
+.borrador-banner{background:#e6f7f1;border:1.5px solid #0e7a5a;border-radius:6px;padding:7px 12px;font-size:11px;color:#0a5c43;font-weight:700;margin-bottom:8px;display:none;text-align:center}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.dtab{padding:10px 18px;font-size:12px;font-weight:600;border:none;border-bottom:3px solid transparent;background:transparent;cursor:pointer;color:#6a8aaa;white-space:nowrap;transition:all .15s}
+.dtab:hover:not(.active){background:#f0f6ff;color:#1556a0}
+.dtab.active{border-bottom-color:#1556a0;color:#1556a0;background:#f0f6ff}
+.dreg-tbl{width:100%;border-collapse:collapse;font-size:11px;min-width:1800px}
+.dreg-tbl th{background:#1556a0;color:#fff;padding:7px 8px;text-align:left;border-bottom:2px solid #0e3d78;border-right:1px solid #1e6bc5;font-size:9px;font-weight:700;text-transform:uppercase;white-space:nowrap;position:sticky;top:0;z-index:10}
+.dreg-tbl th.th-group{background:#0a2d5a;font-size:8px;text-align:center;padding:4px 6px;border-right:2px solid #1e6bc5;letter-spacing:.05em}
+.dreg-tbl th.frozen{position:sticky;left:0;z-index:20;background:#1556a0}
+.dreg-tbl td{padding:5px 8px;border-bottom:1px solid #e8eef8;border-right:1px solid #f0f4f8;vertical-align:middle;font-size:11px}
+.dreg-tbl td.frozen{position:sticky;left:0;z-index:5;background:#fff;font-weight:700;border-right:2px solid #d0dcea}
+.dreg-tbl tr:hover td{background:#f0f6ff}
+.dreg-tbl tr:hover td.frozen{background:#e8f0fb}
+.dreg-tbl td.num{text-align:center;color:#5a7a9a;font-weight:700;font-size:10px}
+.dreg-tbl td.ctr{text-align:center}
+.dreg-tbl td.sm{font-size:10px;color:#5a7a9a}
+.dreg-tbl td.vital{text-align:center;font-size:10px;font-family:monospace;color:#1a4a80}
+.mat-wrap{overflow-x:auto;overflow-y:auto;max-height:75vh;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.col-toggle{display:flex;flex-wrap:wrap;gap:5px;padding:10px 14px;background:#fff;border-radius:8px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,.07)}
+.col-btn{padding:3px 10px;font-size:10px;font-weight:700;border-radius:12px;border:1.5px solid #c8d8e8;cursor:pointer;background:#fff;color:#5a7a9a;transition:all .15s}
+.col-btn.on{background:#1556a0;color:#fff;border-color:#1556a0}
+.d-modal-bg{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:2000;overflow-y:auto;padding:20px}
+.d-modal{max-width:720px;margin:20px auto;background:#fff;border-radius:10px;padding:22px;box-shadow:0 8px 30px rgba(0,0,0,.2)}
+
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div>
+    <div class="hdr-title">🏥 FICHA MÉDICA OCUPACIONAL</div>
+    <div class="hdr-sub">SNS-MSP/HCU-form.123/2025 &nbsp;|&nbsp; CASISO S.A.S. &nbsp;|&nbsp; Dr. Martín Lino Zambrano</div>
+  </div>
+  <div class="hdr-right">
+    <button class="btn-hdr" style="background:#1a6a8a" onclick="toggleDashboard()">📈 Estadísticas</button>
+  </div>
+</div>
+
+<div class="steps-wrap"><div class="steps" id="steps-bar"></div></div>
+<div class="msg-bar" id="msg-bar"></div>
+
+<div class="main">
+  <div id="mat-panel" class="mat-panel" style="display:none">
+    <div class="mat-title">📋 Registros en Matriz</div>
+    <div class="mat-sub" id="mat-names"></div>
+  </div>
+
+  <!-- DASHBOARD ESTADÍSTICAS — COMPLETO -->
+  <!-- ══════════════════════════════════════════════════════
+       PANEL ESTADÍSTICAS / DASHBOARD
+  ═══════════════════════════════════════════════════════ -->
+  <div id="dashboard-panel" style="display:none;background:#f0f4f8;min-height:calc(100vh - 80px)">
+
+    <!-- Header -->
+    <div style="background:linear-gradient(135deg,#0a2d5a,#1556a0);color:#fff;padding:11px 18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <div>
+        <div style="font-size:14px;font-weight:700">📊 Estadísticas — CASISO S.A.S.</div>
+        <div style="font-size:10px;color:#a8c8ef;margin-top:1px">Dr. Martín Lino Zambrano · Evaluaciones 2026</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <button onclick="toggleDashboard()" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:5px;padding:6px 14px;cursor:pointer;font-size:12px;font-weight:700">✕ Cerrar</button>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div style="background:#fff;border-bottom:2px solid #d0dcea;display:flex;overflow-x:auto">
+      <button class="dtab active" id="dtab-btn-matriz" onclick="showDTab('matriz')">📋 Matriz de Evaluados</button>
+      <button class="dtab" id="dtab-btn-dashboard" onclick="showDTab('dashboard')">📈 Dashboard</button>
+    </div>
+
+    <!-- ═══════════════ TAB: MATRIZ ═══════════════ -->
+    <div id="dtab-matriz" style="padding:14px">
+
+      <!-- Empresa header -->
+      <div style="background:#fff;border-radius:10px;padding:12px 16px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.07);display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:240px">
+          <span style="font-size:11px;font-weight:700;color:#5a7a9a;white-space:nowrap">EMPRESA:</span>
+          <input id="mat-empresa" type="text" placeholder="Nombre de la empresa evaluada"
+            value="" oninput="matEmpresaChange()"
+            style="flex:1;font-size:13px;font-weight:700;color:#1556a0;border:1.5px solid #d0dcea;border-radius:6px;padding:6px 10px;outline:none">
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span id="mat-count" style="font-size:11px;color:#6a8aaa;font-weight:700;background:#f0f4f8;padding:4px 10px;border-radius:10px">0 evaluados</span>
+          <button onclick="matAgregarFila()" style="background:#27ae60;color:#fff;border:none;border-radius:6px;padding:7px 13px;cursor:pointer;font-size:11px;font-weight:700;white-space:nowrap">➕ Nueva fila</button>
+          <button onclick="cargarMatriz()" style="background:#1556a0;color:#fff;border:none;border-radius:6px;padding:7px 13px;cursor:pointer;font-size:11px;font-weight:700">↺ Recargar</button>
+        </div>
+      </div>
+
+      <!-- Tabla matriz -->
+      <div style="background:#fff;border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.08);overflow:hidden">
+        <div style="overflow-x:auto;overflow-y:auto;max-height:70vh">
+          <table id="mat-table" style="width:100%;border-collapse:collapse;font-size:11px;min-width:1100px">
+            <thead>
+              <tr style="background:linear-gradient(135deg,#0a2d5a,#1556a0)">
+                <th style="padding:9px 8px;color:rgba(255,255,255,.7);font-size:9px;font-weight:700;text-transform:uppercase;white-space:nowrap;width:36px">#</th>
+                <th style="padding:9px 10px;color:#fff;font-size:9px;font-weight:700;text-transform:uppercase;text-align:left;min-width:110px">Cédula</th>
+                <th style="padding:9px 10px;color:#fff;font-size:9px;font-weight:700;text-transform:uppercase;text-align:left;min-width:170px">Nombres y Apellidos</th>
+                <th style="padding:9px 8px;color:#fff;font-size:9px;font-weight:700;text-transform:uppercase;text-align:center;width:50px">Edad</th>
+                <th style="padding:9px 8px;color:#fff;font-size:9px;font-weight:700;text-transform:uppercase;text-align:center;min-width:95px">Fecha Ingreso</th>
+                <th style="padding:9px 8px;color:#fff;font-size:9px;font-weight:700;text-transform:uppercase;text-align:center;width:55px">Años Lab.</th>
+                <th style="padding:9px 10px;color:#fff;font-size:9px;font-weight:700;text-transform:uppercase;text-align:left;min-width:140px">Cargo</th>
+                <th style="padding:9px 8px;color:#fff;font-size:9px;font-weight:700;text-transform:uppercase;text-align:center;min-width:95px">Fecha Evaluación</th>
+                <th style="padding:9px 8px;color:#fff;font-size:9px;font-weight:700;text-transform:uppercase;text-align:center;min-width:120px">Aptitud</th>
+                <th style="padding:9px 8px;color:#fff;font-size:9px;font-weight:700;text-transform:uppercase;text-align:center;min-width:110px">Tipo Dx</th>
+                <th style="padding:9px 10px;color:#fff;font-size:9px;font-weight:700;text-transform:uppercase;text-align:left;min-width:260px">Diagnósticos</th>
+                <th style="padding:9px 8px;color:#fff;font-size:9px;font-weight:700;text-transform:uppercase;text-align:center;width:70px">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="mat-tbody">
+              <tr><td colspan="12" style="text-align:center;padding:40px;color:#bbb">
+                <div style="font-size:32px;margin-bottom:8px">📋</div>
+                <div style="font-size:12px;font-weight:600;color:#888">La matriz está vacía</div>
+                <div style="font-size:11px;color:#aaa;margin-top:4px">Usa ➕ Nueva fila para ingresar datos manualmente</div>
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div id="mat-footer" style="padding:7px 14px;background:#f8fafd;border-top:1px solid #e8eef8;font-size:10px;color:#9aabbc;display:flex;justify-content:space-between">
+          <span id="mat-empresa-footer">CASISO S.A.S. — Dr. Martín Lino Zambrano</span>
+          <span id="mat-time"></span>
+        </div>
+      </div>
+
+    </div><!-- /dtab-matriz -->
+
+    <!-- ═══════════════ TAB: DASHBOARD ═══════════════ -->
+    <div id="dtab-dashboard" style="display:none;padding:14px">
+
+      <!-- KPIs -->
+      <div id="dash-kpis" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;margin-bottom:12px"></div>
+
+      <!-- Progreso -->
+      <div style="background:#fff;border-radius:8px;padding:12px 16px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.07)">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:#5a7a9a;margin-bottom:4px">
+          <span style="font-weight:700;color:#1556a0;font-size:12px">Avance</span>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="font-size:10px;color:#9aabbc">Meta:</span>
+            <input type="number" id="inp-planificadas" value="25" min="1"
+              style="width:55px;text-align:center;font-size:12px;font-weight:700;padding:3px 5px;border:1.5px solid #d0dcea;border-radius:4px;color:#1556a0"
+              oninput="actualizarProgreso()">
+          </div>
+          <span id="prog-texto" style="font-weight:600"></span>
+        </div>
+        <div style="background:#e8eef8;border-radius:6px;height:10px;overflow:hidden">
+          <div id="prog-barra" style="height:100%;width:0%;background:linear-gradient(90deg,#1e7a3a,#27ae60);border-radius:6px;transition:width .5s"></div>
+        </div>
+      </div>
+
+      <!-- Fila 1 -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+        <div class="dash-card">
+          <div class="dash-card-title">⚧ Género / Sexo</div>
+          <div id="leg-gen" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px"></div>
+          <div style="position:relative;height:160px"><canvas id="ch-genero"></canvas></div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-card-title">📅 Grupos de edad</div>
+          <div style="position:relative;height:180px"><canvas id="ch-edad"></canvas></div>
+        </div>
+      </div>
+      <!-- Fila 2 -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+        <div class="dash-card">
+          <div class="dash-card-title">✅ Aptitud médica laboral</div>
+          <div id="leg-apt" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px"></div>
+          <div style="position:relative;height:160px"><canvas id="ch-aptitud"></canvas></div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-card-title">⚖️ IMC</div>
+          <div style="position:relative;height:180px"><canvas id="ch-imc"></canvas></div>
+        </div>
+      </div>
+      <div class="dash-card" style="margin-bottom:12px">
+        <div class="dash-card-title">💼 Cargos</div>
+        <div style="position:relative;height:220px" id="box-cargos"><canvas id="ch-cargos"></canvas></div>
+      </div>
+      <div class="dash-card" style="margin-bottom:12px">
+        <div class="dash-card-title">🔬 Diagnósticos CIE-10 más frecuentes</div>
+        <div style="position:relative;height:260px" id="box-dx"><canvas id="ch-dx"></canvas></div>
+      </div>
+      <div class="dash-card" style="margin-bottom:12px">
+        <div class="dash-card-title">🏥 Sistemas orgánicos afectados</div>
+        <div style="position:relative;height:200px" id="box-sis"><canvas id="ch-sistemas"></canvas></div>
+      </div>
+      <div class="dash-card" style="margin-bottom:12px">
+        <div class="dash-card-title">💊 ECNT detectadas</div>
+        <div style="position:relative;height:190px"><canvas id="ch-ecnt"></canvas></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+        <div class="dash-card">
+          <div class="dash-card-title">🚨 Grupos prioritarios</div>
+          <div style="position:relative;height:180px"><canvas id="ch-gp"></canvas></div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-card-title">🩸 Grupos sanguíneos</div>
+          <div style="position:relative;height:180px"><canvas id="ch-gs"></canvas></div>
+        </div>
+      </div>
+
+    </div><!-- /dtab-dashboard -->
+
+    <!-- ═══════════════ TAB: ECNT CONFIG ═══════════════ -->
+    <div id="dtab-config" style="display:none;padding:14px">
+      <div style="max-width:680px;margin:0 auto">
+        <div style="background:#fff;border-radius:10px;padding:18px;box-shadow:0 1px 6px rgba(0,0,0,.08);margin-bottom:10px">
+          <h3 style="color:#1556a0;font-size:13px;margin:0 0 10px">⚙️ Códigos CIE-10 clasificados como ECNT</h3>
+          <div style="display:grid;grid-template-columns:120px 1fr auto;gap:7px;margin-bottom:12px;align-items:end">
+            <div>
+              <label style="font-size:10px;font-weight:700;color:#5a7a9a;display:block;margin-bottom:3px">CIE-10</label>
+              <input id="new-cie" type="text" placeholder="ej. J45" maxlength="10"
+                style="font-size:12px;padding:6px 9px;border:1.5px solid #c8d8e8;border-radius:5px;width:100%;text-transform:uppercase"
+                oninput="this.value=this.value.toUpperCase()">
+            </div>
+            <div>
+              <label style="font-size:10px;font-weight:700;color:#5a7a9a;display:block;margin-bottom:3px">NOMBRE ECNT</label>
+              <input id="new-ecnt-nombre" type="text" placeholder="ej. Asma, Enfermedad renal crónica"
+                style="font-size:12px;padding:6px 9px;border:1.5px solid #c8d8e8;border-radius:5px;width:100%">
+            </div>
+            <button onclick="agregarECNT()" style="background:#1556a0;color:#fff;border:none;border-radius:5px;padding:7px 13px;cursor:pointer;font-size:11px;font-weight:700;height:32px">➕</button>
+          </div>
+          <div id="tabla-ecnt"></div>
+          <button onclick="resetECNT()" style="margin-top:10px;background:#fff;color:#e74c3c;border:1.5px solid #e8b4b4;border-radius:5px;padding:6px 12px;cursor:pointer;font-size:11px;font-weight:700">↺ Restaurar defecto</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal edición -->
+    <div class="d-modal-bg" id="modal-edit">
+      <div class="d-modal">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;border-bottom:2px solid #e8eef8;padding-bottom:10px">
+          <h3 style="color:#1556a0;font-size:14px;margin:0">✏️ Editar registro</h3>
+          <button onclick="cerrarModal()" style="background:#e8eef8;border:none;border-radius:5px;padding:4px 12px;cursor:pointer;font-size:13px">✕</button>
+        </div>
+        <div id="modal-form"></div>
+        <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end;border-top:1px solid #e8eef8;padding-top:10px">
+          <button onclick="cerrarModal()" style="background:#e8eef8;border:none;border-radius:5px;padding:7px 16px;cursor:pointer;font-size:12px;font-weight:600">Cancelar</button>
+          <button onclick="guardarEdicion()" style="background:#1556a0;color:#fff;border:none;border-radius:5px;padding:7px 18px;cursor:pointer;font-size:12px;font-weight:700">💾 Guardar</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /dashboard-panel -->
+
+  <div id="form-content"></div>
+</div>
+
+<script>
+const STEPS=["Datos Generales","Antecedentes","Examen Clínico","Riesgos Laborales","Exámenes y Dx","Aptitud y Cierre"];
+let currentStep=0;
+let matrizCount=0;
+
+const RIESGOS={
+  "FÍSICO":["Temperaturas altas","Temperaturas bajas","Radiación Ionizante","Radiación No Ionizante","Ruido","Vibración","Iluminación","Ventilación","Fluido eléctrico"],
+  "SEG. LOCATIVOS":["Falta de señalización, aseo, desorden"],
+  "SEG. MECÁNICOS":["Atrapamiento entre Máquinas","Atrapamiento entre objetos","Caída de objetos","Caídas al mismo nivel","Caídas a diferente nivel","Pinchazos","Cortes","Choques/colisión vehicular","Atropellamientos","Proyección de fluidos","Proyección de partículas","Contacto superficies trabajo"],
+  "SEG. ELÉCTRICOS":["Contacto eléctrico"],
+  "QUÍMICO":["Polvos","Sólidos","Humos","Líquidos","Vapores","Aerosoles","Neblinas","Gaseosos"],
+  "BIOLÓGICO":["Virus","Hongos","Bacterias","Parásitos","Exp. vectores","Exp. animales selváticos"],
+  "ERGONÓMICO":["Manejo manual de cargas","Movimientos repetitivos","Posturas forzadas","Trabajos con PVD","Diseño inadecuado del puesto"],
+  "PSICOSOCIAL":["Monotonía del trabajo","Sobrecarga laboral","Minuciosidad de la tarea","Alta responsabilidad","Autonomía en decisiones","Supervisión deficiente","Conflicto de rol","Falta de claridad funciones","Distribución del trabajo","Turnos rotativos","Relaciones interpersonales","Inestabilidad laboral","Amenaza delincuencial"]
+};
+
+const EF_SECCIONES=[
+  {num:1,nombre:"Piel",        items:["Cicatrices","Piel y Faneras"]},
+  {num:2,nombre:"Ojos",        items:["Párpados","Conjuntivas","Pupilas","Córnea","Motilidad"]},
+  {num:3,nombre:"Oído",        items:["C. auditivo externo","Pabellón","Tímpanos"]},
+  {num:4,nombre:"Orofaringe",  items:["Labios","Lengua","Faringe","Amígdalas","Dentadura"]},
+  {num:5,nombre:"Nariz",       items:["Tabique","Cornetes","Mucosas","Senos paranasales"]},
+  {num:6,nombre:"Cuello",      items:["Tiroides / masas","Movilidad"]},
+  {num:7,nombre:"Tórax",       items:["Mamas","Corazón"]},
+  {num:8,nombre:"Tórax/Pulm.", items:["Pulmones","Corazón","Parrilla costal"]},
+  {num:9,nombre:"Abdomen",     items:["Vísceras","Pared abdominal"]},
+  {num:10,nombre:"Columna",    items:["Flexibilidad","Desviación","Dolor"]},
+  {num:11,nombre:"Pelvis",     items:["Pelvis","Genitales"]},
+  {num:12,nombre:"Extremidades",items:["Vascular","Miembros superiores","Miembros inferiores"]},
+  {num:13,nombre:"Neurológico",items:["Fuerza","Sensibilidad","Marcha","Reflejos osteotendinosos"]},
+];
+function initEFItems(){const r={};EF_SECCIONES.forEach(s=>s.items.forEach((it,ii)=>{r[`${s.num}|${ii}`]={checked:false,desc:""};}));return r;}
+function initRiesgos(){const r={};Object.values(RIESGOS).flat().forEach(n=>{r[n]=[false,false,false,false,false,false,false];});return r;}
+
+let form = {
+  institucion:"",ruc:"",ciiu:"",establecimiento:"",nroHistoria:"",nroArchivo:"",
+  primerApellido:"",segundoApellido:"",primerNombre:"",segundoNombre:"",cedula:"",
+  embarazada:false,discapacidad:false,enfCatastrofica:false,adultoMayor:false,
+  sexo:"",fechaNacimiento:"",edad:"",grupoSanguineo:"",lateralidad:"",
+  puestoCIUO:"",fechaAtencion:"",fechaIngreso:"",fechaReintegro:"",fechaUltimoDia:"",
+  tipoEvaluacion:"",motivoObs:"",
+  antClinico:"",antFamiliares:"",condEspecial:"",
+  autTransfusion:"",ttoHormonal:"",ttoHormonalCual:"",
+  fum:"",gestas:"",partos:"",cesareas:"",abortos:"",metPlanFem:"",
+  examRepMasc:"",tiempoRepMasc:"",metPlanMasc:"",
+  tabacoT:"",tabacoEx:false,tabacoAbs:"",tabacoNo:false,
+  alcoholT:"",alcoholEx:false,alcoholAbs:"",alcoholNo:false,
+  otraSustancia:"",otraSustanciaT:"",otraSustanciaEx:false,otraSustanciaAbs:"",otraSustanciaNo:false,
+  actFisicaSi:"",actFisicaCual:"",actFisicaT:"",
+  medicHabitual:false,medicHabitualCual:"",medicHabitualCantidad:"",
+  ginecoNoAplica:false,
+  enfermedadActual:"",
+  temperatura:"",pa:"",fc:"",fr:"",spo2:"",peso:"",talla:"",imc:"",perAbdominal:"",
+  examenFisicoObs:"",
+  examenFisicoItems:initEFItems(),
+  examenFisicoRegiones:{
+    "1. Piel":{checked:false,hallazgo:""},
+    "2. Ojos":{checked:false,hallazgo:""},
+    "3. Oído":{checked:false,hallazgo:""},
+    "4. Orofaringe":{checked:false,hallazgo:""},
+    "5. Nariz":{checked:false,hallazgo:""},
+    "6. Cuello":{checked:false,hallazgo:""},
+    "7. Tórax/Mamas":{checked:false,hallazgo:""},
+    "8. Tórax/Pulmones-Corazón":{checked:false,hallazgo:""},
+    "9. Abdomen":{checked:false,hallazgo:""},
+    "10. Columna":{checked:false,hallazgo:""},
+    "11. Pelvis/Genitales":{checked:false,hallazgo:""},
+    "12. Extremidades/Vascular":{checked:false,hallazgo:""},
+    "13. Neurológico":{checked:false,hallazgo:""}
+  },
+  puestoRiesgo:"",actividades:["","","","","","",""],
+  riesgos:initRiesgos(),
+  medidasPreventivas:"",
+  antLaborales:[{centro:"",actividades:"",anterior:false,actual:false,tiempo:"",incidente:false,accidente:false,ep:false,iesssi:false,iessno:false,fecha:"",especificar:""}],
+  actExtraLaborales:"",
+  examenes:[{nombre:"",fecha:"",resultado:""}],
+  examenesObs:"",
+  diagnosticos:[{cie10:"",desc:"",tipo:""},{cie10:"",desc:"",tipo:""},{cie10:"",desc:"",tipo:""},{cie10:"",desc:"",tipo:""},{cie10:"",desc:"",tipo:""},{cie10:"",desc:"",tipo:""}],
+  aptitud:"",aptitudObs:"",
+  recomendaciones:"",
+  retiroEval:"",retiroRelacionado:"",retiroObs:"",
+  nombreProf:"Dr. Martín Lino Zambrano",codigoMedico:""
+};
+
+function calcIMC(){
+  const p=parseFloat(form.peso),t=parseFloat(form.talla);
+  if(p>0&&t>0){const tm=t>3?t/100:t;form.imc=(p/(tm*tm)).toFixed(1);}else form.imc="";
+  const el=document.getElementById('f-imc');if(el)el.value=form.imc||"";
+  const b=document.getElementById('imc-badge');
+  if(b&&form.imc){
+    const v=parseFloat(form.imc);
+    const [txt,bg,co]=v<18.5?["Bajo peso","#fff8e8","#7a4a00"]:v<25?["✓ Normal","#eaf6ee","#1e5530"]:v<30?["Sobrepeso","#fff3ec","#7a3000"]:v<35?["Obesidad I","#fceaea","#701010"]:["Obesidad II+","#7a0000","#fff"];
+    b.style.cssText=`background:${bg};color:${co};display:inline-block`;
+    b.textContent=`IMC ${form.imc} kg/m² — ${txt}`;
+  }else if(b)b.style.display='none';
+}
+function calcEdad(){
+  if(form.fechaNacimiento){
+    const bd=new Date(form.fechaNacimiento),hoy=new Date();
+    let edad=hoy.getFullYear()-bd.getFullYear();
+    if(hoy.getMonth()<bd.getMonth()||(hoy.getMonth()===bd.getMonth()&&hoy.getDate()<bd.getDate()))edad--;
+    form.edad=String(edad);
+    const el=document.getElementById('f-edad');if(el)el.value=form.edad;
+  }
+}
+function f(k,v){form[k]=v;if(k==='peso'||k==='talla')calcIMC();if(k==='fechaNacimiento')calcEdad();}
+function setAct(i,v){form.actividades[i]=v;}
+function setRiesgo(n,i,v){if(form.riesgos[n])form.riesgos[n][i]=v;}
+function setAntLab(i,k,v){form.antLaborales[i][k]=v;}
+function addAntLab(){form.antLaborales.push({centro:"",actividades:"",anterior:false,actual:false,tiempo:"",incidente:false,accidente:false,ep:false,iesssi:false,iessno:false,fecha:"",especificar:""});render();}
+function removeAntLab(i){form.antLaborales.splice(i,1);render();}
+function setExam(i,k,v){form.examenes[i][k]=v;}
+function addExam(){form.examenes.push({nombre:"",fecha:"",resultado:""});render();}
+function removeExam(i){if(form.examenes.length>1){form.examenes.splice(i,1);render();}}
+function setDx(i,k,v){form.diagnosticos[i][k]=v;}
+function setRegion(region,key,value){
+  if(form.examenFisicoRegiones[region]){
+    form.examenFisicoRegiones[region][key]=value;
+    if(key==='checked') render();
+  }
+}
+function setEFItem(key,field,value){
+  if(!form.examenFisicoItems[key])form.examenFisicoItems[key]={checked:false,desc:""};
+  form.examenFisicoItems[key][field]=value;
+  if(field==='checked')render();
+}
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function inp(lbl,k,type='text',extra='',xid=''){
+  return `<div class="fld"><label>${lbl}</label><input type="${type}" value="${esc(form[k]||'')}" data-key="${k}" ${xid?`id="${xid}"`:''}${extra?` ${extra}`:''} oninput="f('${k}',this.value)"></div>`;
+}
+function slct(lbl,k,opts){
+  const v=form[k]||'';
+  const o=`<option value="">— Selec. —</option>`+opts.map(op=>typeof op==='object'?`<option value="${op.v}"${v===op.v?' selected':''}>${op.l}</option>`:`<option value="${op}"${v===op?' selected':''}>${op}</option>`).join('');
+  return `<div class="fld"><label>${lbl}</label><select onchange="f('${k}',this.value)">${o}</select></div>`;
+}
+function ta(lbl,k,rows=3){return `<div class="fld"><label>${lbl}</label><textarea rows="${rows}" oninput="f('${k}',this.value)">${esc(form[k]||'')}</textarea></div>`;}
+function chkEl(lbl,k){return `<label class="chi"><input type="checkbox" ${form[k]?'checked':''} onchange="f('${k}',this.checked)">${lbl}</label>`;}
+function rad(name,val,lbl,k){return `<label class="chi"><input type="radio" name="${name}" value="${val}" ${form[k]===val?'checked':''} onchange="f('${k}',this.value)">${lbl}</label>`;}
+
+// ─── STEPS ───
+function gotoStep(n){currentStep=n;render();}
+function renderSteps(){
+  document.getElementById('steps-bar').innerHTML=STEPS.map((s,i)=>
+    `<button class="step-btn${i===currentStep?' active':''}" onclick="gotoStep(${i})"><span class="sn">${i+1}</span>${s}</button>`).join('');
+}
+
+function step0(){return `
+<div class="card"><div class="sec">A. Datos del Establecimiento</div><div class="sb">
+  <div class="g3" style="margin-bottom:8px">${inp('Institución del Sistema','institucion')}<div class="g2">${inp('RUC','ruc')}${inp('CIIU','ciiu')}</div></div>
+  <div class="g3">${inp('Establecimiento / Centro de Trabajo','establecimiento')}${inp('N° Historia Clínica','nroHistoria')}${inp('N° Archivo','nroArchivo')}</div>
+</div></div>
+<div class="card"><div class="sec sub">A. Datos del Usuario</div><div class="sb">
+  <div class="g4" style="margin-bottom:8px">
+    ${inp('Primer Apellido','primerApellido')}${inp('Segundo Apellido','segundoApellido')}
+    ${inp('Primer Nombre','primerNombre')}${inp('Segundo Nombre','segundoNombre')}
+  </div>
+  <div style="margin-bottom:8px">${inp('Cédula de Ciudadanía','cedula')}</div>
+  <div class="g2">
+    <div><div class="sub-lbl">Grupo de Atención Prioritaria</div>
+      <div class="chk-g">${chkEl('Embarazada','embarazada')}${chkEl('Discapacidad','discapacidad')}${chkEl('Enf. Catastrófica','enfCatastrofica')}${chkEl('Adulto Mayor','adultoMayor')}</div>
+    </div>
+    <div class="g3">
+      ${slct('Sexo','sexo',['Hombre','Mujer'])}
+      ${inp('Fecha Nacimiento','fechaNacimiento','date')}
+      ${inp('Edad (auto)','edad','text','readonly','f-edad')}
+      ${slct('Grupo Sanguíneo','grupoSanguineo',['A+','A-','B+','B-','AB+','AB-','O+','O-'])}
+      ${slct('Lateralidad','lateralidad',['Diestro','Zurdo','Ambidiestro'])}
+    </div>
+  </div>
+</div></div>
+<div class="card"><div class="sec teal">B. Motivo de Consulta</div><div class="sb">
+  <div style="margin-bottom:8px">${inp('Puesto de Trabajo (CIUO)','puestoCIUO')}</div>
+  <div class="g4" style="margin-bottom:8px">
+    ${inp('Fecha de Atención','fechaAtencion','date')}${inp('Fecha de Ingreso','fechaIngreso','date')}
+    ${inp('Fecha de Reintegro','fechaReintegro','date')}${inp('Fecha Último Día Laboral','fechaUltimoDia','date')}
+  </div>
+  <div class="sub-lbl">Tipo de Evaluación</div>
+  <div class="chk-g">
+    ${rad('tipo','INGRESO','INGRESO','tipoEvaluacion')}${rad('tipo','PERIÓDICO','PERIÓDICO','tipoEvaluacion')}
+    ${rad('tipo','REINTEGRO','REINTEGRO','tipoEvaluacion')}${rad('tipo','RETIRO','RETIRO','tipoEvaluacion')}
+  </div>
+  <div style="margin-top:8px">${ta('Observación','motivoObs',2)}</div>
+</div></div>`;}
+
+function step1(){return `
+<div class="card"><div class="sec">C. Antecedentes Personales</div><div class="sb">
+  ${ta('Antecedentes Clínicos y Quirúrgicos','antClinico',3)}
+  <div style="margin-top:8px">${ta('Antecedentes Familiares','antFamiliares',2)}</div>
+  <div style="margin-top:8px">${ta('Condición especial (urgencia/emergencia/tratamiento)','condEspecial',2)}</div>
+  <div class="g3" style="margin-top:8px">
+    ${slct('Autoriza Transfusiones','autTransfusion',['SI','NO'])}
+    ${slct('Tratamiento Hormonal','ttoHormonal',['SI','NO'])}
+    ${inp('¿Cuál tratamiento?','ttoHormonalCual')}
+  </div>
+</div></div>
+<div class="card"><div class="sec pink">Antecedentes Gineco Obstétricos</div><div class="sb">
+  <div style="margin-bottom:8px">${chkEl('No Aplica (paciente masculino o no corresponde)','ginecoNoAplica')}</div>
+  ${!form.ginecoNoAplica?`<div class="g4">
+    ${inp('FUM (Última Menstruación)','fum','date')}${inp('Gestas','gestas','number')}
+    ${inp('Partos','partos','number')}${inp('Cesáreas','cesareas','number')}
+    ${inp('Abortos','abortos','number')}${inp('Método Planificación Familiar','metPlanFem')}
+  </div>`:'<div style="color:#888;font-size:11px;padding:4px 0">Sección no aplica — marcado en el Excel.</div>'}
+</div></div>
+<div class="card"><div class="sec sub">Antecedentes Reproductivos Masculinos</div><div class="sb">
+  <div class="g3">
+    ${inp('Exámenes Realizados ¿Cuál?','examRepMasc')}${inp('Tiempo (años)','tiempoRepMasc','number')}${inp('Método Planificación Familiar','metPlanMasc')}
+  </div>
+</div></div>
+<div class="card"><div class="sec gray">Consumo de Sustancias / Estilo de Vida</div><div class="sb">
+  <table class="tbl" style="margin-bottom:10px">
+    <thead><tr><th>Sustancia</th><th>Tiempo</th><th>Ex Consumidor</th><th>T. Abstinencia (m)</th><th>No Consume</th></tr></thead>
+    <tbody>
+      <tr><td><b>TABACO</b></td><td><input oninput="f('tabacoT',this.value)" value="${esc(form.tabacoT)}"></td><td style="text-align:center"><input type="checkbox" ${form.tabacoEx?'checked':''} onchange="f('tabacoEx',this.checked)" style="accent-color:#1556a0"></td><td><input oninput="f('tabacoAbs',this.value)" value="${esc(form.tabacoAbs)}"></td><td style="text-align:center"><input type="checkbox" ${form.tabacoNo?'checked':''} onchange="f('tabacoNo',this.checked)" style="accent-color:#1556a0"></td></tr>
+      <tr><td><b>ALCOHOL</b></td><td><input oninput="f('alcoholT',this.value)" value="${esc(form.alcoholT)}"></td><td style="text-align:center"><input type="checkbox" ${form.alcoholEx?'checked':''} onchange="f('alcoholEx',this.checked)" style="accent-color:#1556a0"></td><td><input oninput="f('alcoholAbs',this.value)" value="${esc(form.alcoholAbs)}"></td><td style="text-align:center"><input type="checkbox" ${form.alcoholNo?'checked':''} onchange="f('alcoholNo',this.checked)" style="accent-color:#1556a0"></td></tr>
+      <tr><td><input placeholder="Otras..." oninput="f('otraSustancia',this.value)" value="${esc(form.otraSustancia)}"></td><td><input oninput="f('otraSustanciaT',this.value)" value="${esc(form.otraSustanciaT)}"></td><td style="text-align:center"><input type="checkbox" ${form.otraSustanciaEx?'checked':''} onchange="f('otraSustanciaEx',this.checked)" style="accent-color:#1556a0"></td><td><input oninput="f('otraSustanciaAbs',this.value)" value="${esc(form.otraSustanciaAbs||'')}"></td><td style="text-align:center"><input type="checkbox" ${form.otraSustanciaNo?'checked':''} onchange="f('otraSustanciaNo',this.checked)" style="accent-color:#1556a0"></td></tr>
+    </tbody>
+  </table>
+  <div class="g2">
+    <div>
+      <div class="sub-lbl" style="margin-bottom:5px">Actividad Física</div>
+      <div class="g3">
+        ${inp('¿Cuál? (tipo de actividad)','actFisicaCual')}
+        ${inp('Tiempo / Frecuencia','actFisicaT')}
+        <div class="fld"><label>¿Realiza actividad?</label>
+          <select onchange="f('actFisicaSi',this.value)" style="border:1.5px solid #c8d8e8;border-radius:4px;padding:5px 8px;font-size:12px;width:100%">
+            <option value="" ${!form.actFisicaSi?'selected':''}>— Seleccionar —</option>
+            <option value="SI" ${form.actFisicaSi==='SI'?'selected':''}>Sí</option>
+            <option value="NO" ${form.actFisicaSi==='NO'?'selected':''}>No</option>
+            <option value="NO APLICA" ${form.actFisicaSi==='NO APLICA'?'selected':''}>No aplica</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div>${chkEl('Medicación Habitual','medicHabitual')}${form.medicHabitual?`<div class="g2" style="margin-top:7px">${inp('¿Cuál medicación?','medicHabitualCual')}${inp('Cantidad / Dosis','medicHabitualCantidad')}</div>`:''}</div>
+  </div>
+</div></div>`;}
+
+function step2(){return `
+<div class="card"><div class="sec">D. Enfermedad o Problema Actual</div><div class="sb">${ta('Descripción','enfermedadActual',4)}</div></div>
+<div class="card"><div class="sec sub">E. Constantes Vitales y Antropometría</div><div class="sb">
+  <div class="g4" style="margin-bottom:7px">
+    ${inp('Temperatura (°C)','temperatura','number')}${inp('Presión Arterial (mmHg)','pa')}
+    ${inp('FC (lat/min)','fc','number')}${inp('FR (fr/min)','fr','number')}
+    ${inp('SpO2 (%)','spo2','number')}${inp('Peso (Kg)','peso','number')}
+    ${inp('Talla (cm)','talla','number')}
+    <div class="fld"><label>IMC (kg/m²) — automático</label><input id="f-imc" readonly value="${esc(form.imc||'')}"></div>
+    ${inp('Perímetro Abdominal (cm)','perAbdominal','number')}
+  </div>
+  <span class="imc-badge" id="imc-badge" style="display:${form.imc?'inline-block':'none'}">${form.imc?`IMC ${form.imc}`:''}</span>
+</div></div>
+<div class="card"><div class="sec teal">F. Examen Físico Regional</div><div class="sb">
+  <div class="note">Marque <b>X</b> en los ítems con hallazgo y describa. Sin marcado = <b>NORMAL</b>.</div>
+  <div style="overflow-x:auto">
+  <table style="width:100%;border-collapse:collapse;font-size:10px;table-layout:fixed">
+    <colgroup>
+      <col style="width:13%"><col style="width:13%">
+      <col style="width:13%"><col style="width:13%">
+      <col style="width:12%"><col style="width:12%">
+      <col style="width:12%"><col style="width:12%">
+    </colgroup>
+    <tbody>
+    ${(()=>{
+      // Distribute 13 sections across rows, 4 columns each, matching Excel layout
+      // Each cell = one section with its sub-items
+      const cols=4;
+      const rows=Math.ceil(EF_SECCIONES.length/cols);
+      let html='';
+      for(let row=0;row<rows;row++){
+        html+='<tr>';
+        for(let col=0;col<cols;col++){
+          const si=row*cols+col;
+          if(si>=EF_SECCIONES.length){html+='<td colspan="2" style="border:1px solid #c8d8e8;background:#f8fafd"></td>';continue;}
+          const sec=EF_SECCIONES[si];
+          html+=`<td colspan="2" style="border:1px solid #1556a0;vertical-align:top;padding:0">
+            <div style="background:#1556a0;color:#fff;font-size:9px;font-weight:700;padding:3px 6px;display:flex;align-items:center;gap:4px">
+              <span style="background:rgba(255,255,255,.2);border-radius:50%;width:14px;height:14px;display:inline-flex;align-items:center;justify-content:center;font-size:8px;flex-shrink:0">${sec.num}</span>
+              ${sec.nombre}
+            </div>
+            ${sec.items.map((item,ii)=>{
+              const key=`${sec.num}|${ii}`;
+              const dato=form.examenFisicoItems[key]||{checked:false,desc:""};
+              const letra=String.fromCharCode(97+ii);
+              return `<div style="padding:2px 5px;border-bottom:1px solid #e0e8f0;${dato.checked?'background:#f0fff8':''}">
+                <div style="display:flex;align-items:center;gap:4px;cursor:pointer" onclick="setEFItem('${key}','checked',!${dato.checked})">
+                  <div style="width:14px;height:14px;border:1.5px solid ${dato.checked?'#0a6a6a':'#90b0d0'};border-radius:2px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:${dato.checked?'#0a6a6a':'#fff'};font-size:10px;font-weight:900;color:#fff">${dato.checked?'✓':''}</div>
+                  <span style="font-size:10px;color:${dato.checked?'#0a6a6a':'#3a5a7a'};font-weight:${dato.checked?700:400}">${letra}. ${item}</span>
+                </div>
+                ${dato.checked?`<input type="text" value="${esc(dato.desc||'')}" placeholder="Describa hallazgo..." oninput="setEFItem('${key}','desc',this.value)" style="width:100%;border:1px solid #0a6a6a;border-radius:3px;padding:2px 5px;font-size:10px;margin-top:2px;background:#f8fffd;color:#1a2a3a;outline:none">`:''}`
+            }).join('')}
+          </td>`;
+        }
+        html+='</tr>';
+      }
+      return html;
+    })()}
+    </tbody>
+  </table>
+  </div>
+  <div style="margin-top:8px">${ta('Observaciones Generales Adicionales (opcional)','examenFisicoObs',2)}</div>
+</div></div>`;}
+
+function step3(){
+  const actRows=form.actividades.map((a,i)=>`
+    <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px">
+      <span style="font-size:10px;font-weight:700;color:#1556a0;width:38px;flex-shrink:0;background:#e8eef8;padding:3px 5px;border-radius:3px;text-align:center">Act.${i+1}</span>
+      <input style="flex:1;border:1.5px solid #c8d8e8;border-radius:4px;padding:5px 8px;font-size:12px;outline:none;background:#fff;color:#1a2a3a" value="${esc(form.actividades[i])}" oninput="setAct(${i},this.value)" placeholder="Descripción actividad ${i+1}...">
+    </div>`).join('');
+  const riskRows=Object.entries(RIESGOS).map(([cat,risks])=>risks.map((r,ri)=>`<tr>
+    <td class="cat">${ri===0?cat:''}</td><td style="font-size:11px">${r}</td>
+    ${[0,1,2,3,4,5,6].map(i=>`<td style="text-align:center;padding:2px"><input type="checkbox" style="width:12px;height:12px;accent-color:#1556a0" ${(form.riesgos[r]||[])[i]?'checked':''} onchange="setRiesgo('${r.replace(/\\/g,'\\\\').replace(/'/g,"\\'")}',${i},this.checked)"></td>`).join('')}
+  </tr>`).join('')).join('');
+  return `
+<div class="card"><div class="sec">G. Factores de Riesgo del Trabajo Actual</div><div class="sb">
+  <div style="margin-bottom:10px">${inp('Puesto de Trabajo','puestoRiesgo')}</div>
+  <div class="sub-lbl">Actividades Importantes de la Jornada (hasta 7)</div>
+  ${actRows}
+  <div class="sub-lbl" style="margin-top:12px">Matriz de Riesgos — marcar actividades expuestas</div>
+  <div style="overflow-x:auto;border-radius:5px;border:1px solid #c8d8e8">
+    <table class="tbl"><thead><tr><th style="width:100px">Categoría</th><th>Factor de Riesgo</th>
+    ${[1,2,3,4,5,6,7].map(n=>`<th style="width:30px;text-align:center">A${n}</th>`).join('')}</tr></thead>
+    <tbody>${riskRows}</tbody></table>
+  </div>
+  <div style="margin-top:10px">${ta('Medidas Preventivas','medidasPreventivas',3)}</div>
+</div></div>`;}
+
+function step4(){
+  const antRows=form.antLaborales.map((al,i)=>`
+    <div class="lab-row">
+      <div class="g2" style="margin-bottom:6px">
+        <div class="fld"><label>Centro de Trabajo</label><input value="${esc(al.centro)}" oninput="setAntLab(${i},'centro',this.value)"></div>
+        <div class="fld"><label>Actividades que desempeñaba</label><input value="${esc(al.actividades)}" oninput="setAntLab(${i},'actividades',this.value)"></div>
+        <div class="fld"><label>Tiempo de Trabajo</label><input value="${esc(al.tiempo)}" oninput="setAntLab(${i},'tiempo',this.value)"></div>
+        <div class="fld"><label>Fecha IESS</label><input type="date" value="${al.fecha||''}" oninput="setAntLab(${i},'fecha',this.value)"></div>
+      </div>
+      <div class="ic">
+        <label><input type="checkbox" ${al.anterior?'checked':''} onchange="setAntLab(${i},'anterior',this.checked)" style="accent-color:#1556a0"> Anterior</label>
+        <label><input type="checkbox" ${al.actual?'checked':''} onchange="setAntLab(${i},'actual',this.checked)" style="accent-color:#1556a0"> Actual</label>
+        <label><input type="checkbox" ${al.incidente?'checked':''} onchange="setAntLab(${i},'incidente',this.checked)" style="accent-color:#c17a00"> Incidente</label>
+        <label><input type="checkbox" ${al.accidente?'checked':''} onchange="setAntLab(${i},'accidente',this.checked)" style="accent-color:#c15000"> Accidente</label>
+        <label><input type="checkbox" ${al.ep?'checked':''} onchange="setAntLab(${i},'ep',this.checked)" style="accent-color:#a01a1a"> Enf. Prof.</label>
+        <label><input type="checkbox" ${al.iesssi?'checked':''} onchange="setAntLab(${i},'iesssi',this.checked)" style="accent-color:#1e7a3a"> IESS Sí</label>
+        <label><input type="checkbox" ${al.iessno?'checked':''} onchange="setAntLab(${i},'iessno',this.checked)" style="accent-color:#a01a1a"> IESS No</label>
+      </div>
+      <div class="fld" style="margin-top:6px"><label>Especificar</label><input value="${esc(al.especificar)}" oninput="setAntLab(${i},'especificar',this.value)"></div>
+      ${form.antLaborales.length>1?`<div style="text-align:right;margin-top:4px"><button class="rm-btn" onclick="removeAntLab(${i})">× Eliminar</button></div>`:''}
+    </div>`).join('');
+  const examRows=form.examenes.map((ex,i)=>`<tr>
+    <td><input value="${esc(ex.nombre)}" oninput="setExam(${i},'nombre',this.value)" placeholder="Nombre..."></td>
+    <td><input type="date" value="${ex.fecha||''}" oninput="setExam(${i},'fecha',this.value)"></td>
+    <td><input value="${esc(ex.resultado)}" oninput="setExam(${i},'resultado',this.value)" placeholder="Resultado..."></td>
+    <td style="text-align:center">${form.examenes.length>1?`<button class="rm-btn" onclick="removeExam(${i})">×</button>`:''}</td>
+  </tr>`).join('');
+  return `
+<div class="card"><div class="sec">H. Actividad Laboral / Incidentes / Accidentes</div><div class="sb">
+  <div class="note">Antecedentes de empleos anteriores y/o trabajo actual</div>
+  ${antRows}
+  <button class="add-btn" onclick="addAntLab()">+ Agregar registro laboral</button>
+</div></div>
+<div class="card"><div class="sec sub">I. Actividades Extra Laborales</div><div class="sb">${ta('Tipo y Descripción','actExtraLaborales',2)}</div></div>
+<div class="card"><div class="sec teal">J. Resultados de Exámenes (Imagen, Laboratorio y Otros)</div><div class="sb">
+  <table class="tbl"><thead><tr><th>Nombre del Examen</th><th style="width:130px">Fecha</th><th>Resultados</th><th style="width:26px"></th></tr></thead>
+  <tbody>${examRows}</tbody></table>
+  <button class="add-btn" onclick="addExam()">+ Agregar examen</button>
+  <div style="margin-top:8px">${ta('Observaciones de Exámenes','examenesObs',2)}</div>
+</div></div>`;}
+
+const APT_TEXTO={APTO:"APTO",APTO_OBS:"APTO EN OBSERVACIÓN",APTO_LIM:"APTO CON LIMITACIONES",NO_APTO:"NO APTO"};
+function step5(){
+  const dxRows=form.diagnosticos.map((d,i)=>`<tr>
+    <td style="width:24px;text-align:center;font-weight:700;color:#5a7a9a">${i+1}</td>
+    <td style="width:100px"><input value="${esc(d.cie10)}" oninput="setDx(${i},'cie10',this.value)" placeholder="CIE-10"></td>
+    <td><input value="${esc(d.desc)}" oninput="setDx(${i},'desc',this.value)" placeholder="Descripción diagnóstica..."></td>
+    <td style="width:80px"><select onchange="setDx(${i},'tipo',this.value)" style="width:100%;font-size:11px;border:1px solid #c8d8e8;border-radius:3px;padding:3px">
+      <option value="" ${d.tipo===''?'selected':''}>—</option>
+      <option value="PRE" ${d.tipo==='PRE'?'selected':''}>PRE</option>
+      <option value="DEF" ${d.tipo==='DEF'?'selected':''}>DEF</option>
+    </select></td>
+  </tr>`).join('');
+  const aptOpts=[{v:'APTO',ic:'✔',l:'APTO'},{v:'APTO_OBS',ic:'⚠',l:'APTO EN OBSERVACIÓN'},{v:'APTO_LIM',ic:'~',l:'APTO CON LIMITACIONES'},{v:'NO_APTO',ic:'✗',l:'NO APTO'}];
+  return `
+<div class="card"><div class="sec">K. Diagnóstico — PRE: Presuntivo / DEF: Definitivo</div><div class="sb">
+  <div class="note" style="margin-bottom:8px">💡 Para examen sin hallazgos patológicos use <strong>Z00.0</strong> (Examen médico general) — se contabilizará como <em>Hallazgos normales / Paciente sano</em> en el dashboard.</div>
+  <table class="tbl"><thead><tr><th style="width:28px">#</th><th style="width:100px">CIE-10</th><th>Descripción</th><th style="width:80px">PRE/DEF</th></tr></thead><tbody>${dxRows}</tbody></table>
+</div></div>
+<div class="card"><div class="sec teal">L. Aptitud Médica para el Trabajo</div><div class="sb">
+  <div class="apt-grid">
+    ${aptOpts.map(o=>`<label class="apt-opt ${form.aptitud===o.v?'apt-'+o.v:''}">
+      <input type="radio" name="apt" value="${o.v}" ${form.aptitud===o.v?'checked':''} onchange="f('aptitud',this.value);render()" style="display:none">
+      <span style="font-size:16px">${o.ic}</span> ${o.l}</label>`).join('')}
+  </div>
+  ${ta('Observaciones de Aptitud','aptitudObs',3)}
+</div></div>
+<div class="card"><div class="sec sub">M. Recomendaciones y/o Tratamiento</div><div class="sb">${ta('Descripción de Recomendaciones','recomendaciones',4)}</div></div>
+<div class="card"><div class="sec gray">N. Retiro (Evaluación)</div><div class="sb">
+  <div class="g2">
+    ${slct('¿Se realiza la evaluación?','retiroEval',['SI','NO'])}
+    ${slct('¿Condición relacionada con el trabajo?','retiroRelacionado',['SI','NO'])}
+  </div>
+  <div style="margin-top:8px">${ta('Observación','retiroObs',2)}</div>
+</div></div>
+<div class="card"><div class="sec">O. Datos del Profesional</div><div class="sb">
+  <div class="g2">
+    ${inp('Nombres y Apellidos del Profesional','nombreProf')}
+    ${inp('Código Médico MSP','codigoMedico')}
+  </div>
+</div></div>
+<div class="dl-box">
+  <div class="dl-title">📥 Descargar Documentos</div>
+  <div class="borrador-banner" id="borrador-banner">📂 Borrador cargado — recuerda eliminarlo cuando termines</div>
+  <div class="dl-row">
+    <button class="btn-dl btn-ficha" id="btn-ficha" onclick="downloadFicha()">📋 &nbsp;Descargar Ficha Médica Ocupacional</button>
+    <button class="btn-dl btn-ficha" id="btn-consentimiento" onclick="downloadConsentimiento()" style="background:#6a1a8a">📄 &nbsp;Consentimiento Informado</button>
+  </div>
+  <button class="btn-borrador" id="btn-guardar-borrador" onclick="guardarBorrador()">💾 Guardar Borrador</button>
+  <button class="btn-eliminar-borrador" id="btn-eliminar-borrador" onclick="eliminarBorrador()">🗑 Eliminar Borrador</button>
+  <button class="btn-nuevo" onclick="nuevoRegistro()">↺ Nuevo Registro</button>
+</div>`;}
+
+// ─── RENDER ───
+function render(){
+  renderSteps();
+  const steps=[step0,step1,step2,step3,step4,step5];
+  document.getElementById('form-content').innerHTML=steps[currentStep]()+`
+    <div class="nav-bar">
+      <button class="btn-nav" onclick="gotoStep(${currentStep-1})" ${currentStep===0?'disabled':''}>← Anterior</button>
+      <span class="step-info">Paso ${currentStep+1} de ${STEPS.length} — ${STEPS[currentStep]}</span>
+      <button class="btn-nav primary" onclick="gotoStep(${currentStep+1})" ${currentStep===STEPS.length-1?'disabled':''}>Siguiente →</button>
+    </div>`;
+}
+
+function showMsg(txt,type='success'){
+  const b=document.getElementById('msg-bar');
+  b.textContent=txt;b.style.display='block';b.className='msg-bar'+(type!=='success'?` ${type}`:'');
+  setTimeout(()=>b.style.display='none',6000);
+}
+
+function setBtn(id,loading){
+  const b=document.getElementById(id);if(!b)return;
+  b.disabled=loading;
+  b.innerHTML=loading?`<span class="spin"></span> Generando...`:b.dataset.orig||b.innerHTML;
+}
+
+async function downloadFicha(){
+  const btn=document.getElementById('btn-ficha');
+  btn.dataset.orig=btn.innerHTML;btn.disabled=true;btn.innerHTML='<span class="spin"></span> Generando...';
+  try{
+    const res=await fetch('/api/descargar-ficha',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(form)});
+    if(!res.ok)throw new Error(await res.text());
+    const blob=await res.blob();
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    const cd=res.headers.get('Content-Disposition')||'';
+    const fn=cd.match(/filename\*?=(?:UTF-8'')?([^;\n]+)/)?.[1]?.replace(/"/g,'')||'FichaOcupacional.xlsx';
+    a.href=url;a.download=fn;a.click();
+    URL.revokeObjectURL(url);
+    showMsg('✔ Ficha Médica descargada. Excel con 3 hojas: Evaluación 1/3, 2/3 y 3/3.');
+  }catch(e){showMsg('Error: '+e.message,'err');}
+  btn.disabled=false;btn.innerHTML=btn.dataset.orig;
+}
+
+async function downloadCert(){
+  const btn=document.getElementById('btn-cert');
+  btn.dataset.orig=btn.innerHTML;btn.disabled=true;btn.innerHTML='<span class="spin"></span> Generando...';
+  try{
+    const res=await fetch('/api/descargar-certificado',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(form)});
+    if(!res.ok)throw new Error(await res.text());
+    const blob=await res.blob();
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    const cd=res.headers.get('Content-Disposition')||'';
+    const fn=cd.match(/filename\*?=(?:UTF-8'')?([^;\n]+)/)?.[1]?.replace(/"/g,'')||'CertificadoAptitud.xlsx';
+    a.href=url;a.download=fn;a.click();
+    URL.revokeObjectURL(url);
+    showMsg('✔ Certificado de Aptitud descargado correctamente.');
+  }catch(e){showMsg('Error: '+e.message,'err');}
+  btn.disabled=false;btn.innerHTML=btn.dataset.orig;
+}
+
+async function downloadConsentimiento(){
+  const btn=document.getElementById('btn-consentimiento');
+  btn.dataset.orig=btn.innerHTML;btn.disabled=true;btn.innerHTML='<span class="spin"></span> Generando...';
+  try{
+    const res=await fetch('/api/descargar-consentimiento',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(form)});
+    if(!res.ok)throw new Error(await res.text());
+    const blob=await res.blob();
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    const cd=res.headers.get('Content-Disposition')||'';
+    const fn=cd.match(/filename\*?=(?:UTF-8'')?([^;\n]+)/)?.[1]?.replace(/"/g,'')||'ConsentimientoInformado.docx';
+    a.href=url;a.download=fn;a.click();
+    URL.revokeObjectURL(url);
+    showMsg('✔ Consentimiento Informado descargado correctamente.');
+  }catch(e){showMsg('Error: '+e.message,'err');}
+  btn.disabled=false;btn.innerHTML=btn.dataset.orig;
+}
+
+// ─── BORRADORES ───────────────────────────────────────────────
+let _borradorActivo = false;
+
+function _actualizarUIBorrador(activo){
+  _borradorActivo = activo;
+  const banner = document.getElementById('borrador-banner');
+  const btnEl  = document.getElementById('btn-eliminar-borrador');
+  if(banner) banner.style.display = activo ? 'block' : 'none';
+  if(btnEl)  btnEl.style.display  = activo ? 'block' : 'none';
+}
+
+async function guardarBorrador(){
+  const cedula = (form.cedula || form.nroHistoria || '').trim();
+  if(!cedula){ showMsg('Ingresa la cédula antes de guardar el borrador.','err'); return; }
+  const btn = document.getElementById('btn-guardar-borrador');
+  if(btn){ btn.disabled=true; btn.innerHTML='<span class="spin"></span> Guardando...'; }
+  try{
+    const res = await fetch('/api/borrador/guardar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(form)});
+    const data = await res.json();
+    if(!data.ok) throw new Error(data.error||'Error al guardar');
+    _actualizarUIBorrador(true);
+    // El backend ahora también guarda en la matriz automáticamente
+    const nombre = data.nombre || '';
+    showMsg('💾 ' + (nombre ? nombre + ' guardado' : 'Borrador guardado') + ' correctamente en la Matriz.');
+    if(dashVisible) setTimeout(()=>cargarMatriz(), 600);
+  }catch(e){ showMsg('Error: '+e.message,'err'); }
+  if(btn){ btn.disabled=false; btn.innerHTML='💾 Guardar Borrador'; }
+}
+
+async function cargarBorrador(cedula){
+  try{
+    const res = await fetch(`/api/borrador/${encodeURIComponent(cedula)}`);
+    if(res.status===404) return;
+    const data = await res.json();
+    if(!data.ok) return;
+    Object.assign(form, data.data);
+    _actualizarUIBorrador(true);
+    render();
+    showMsg('📂 Borrador encontrado y cargado automáticamente.');
+  }catch(e){ /* silencioso */ }
+}
+
+async function eliminarBorrador(){
+  const cedula = (form.cedula || form.nroHistoria || '').trim();
+  if(!cedula) return;
+  if(!confirm('¿Eliminar el borrador guardado para cédula '+cedula+'?')) return;
+  try{
+    const res = await fetch(`/api/borrador/${encodeURIComponent(cedula)}`,{method:'DELETE'});
+    const data = await res.json();
+    if(!data.ok) throw new Error(data.error||'Error al eliminar');
+    _actualizarUIBorrador(false);
+    showMsg('🗑 Borrador eliminado correctamente.');
+  }catch(e){ showMsg('Error: '+e.message,'err'); }
+}
+
+// Auto-búsqueda cuando se escribe la cédula (con debounce 600ms)
+let _cedulaTimer = null;
+document.addEventListener('input', function(e){
+  if(e.target && e.target.dataset && e.target.dataset.key === 'cedula'){
+    const val = e.target.value.trim();
+    clearTimeout(_cedulaTimer);
+    if(val.length >= 8){
+      _cedulaTimer = setTimeout(()=>cargarBorrador(val), 600);
+    }
+  }
+});
+
+async function addToMatriz(){
+  const btn=document.getElementById('btn-mat');
+  if(btn){btn.dataset.orig=btn.innerHTML;btn.disabled=true;btn.innerHTML='<span class="spin"></span> Agregando...';}
+  try{
+    const res=await fetch('/api/agregar-matriz',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(form)});
+    const data=await res.json();
+    if(!data.ok)throw new Error('Error al agregar');
+    matrizCount=data.total;
+    updateMatrizUI(data.total);
+    showMsg(`✔ "${data.nombre}" agregado/a a la Matriz. Total: ${data.total} registro(s).`);
+    render();
+    if(dashVisible){ setTimeout(()=>{ cargarMatriz(); }, 600); }
+  }catch(e){showMsg('Error: '+e.message,'err');}
+  if(btn){btn.disabled=false;btn.innerHTML=btn.dataset.orig||'Agregar a Matriz';}
+}
+
+async function downloadMatriz(){
+  try{
+    const res=await fetch('/api/descargar-matriz');
+    if(!res.ok)throw new Error(await res.text());
+    const blob=await res.blob();
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    const cd=res.headers.get('Content-Disposition')||'';
+    const fn=cd.match(/filename\*?=(?:UTF-8'')?([^;\n]+)/)?.[1]?.replace(/"/g,'')||'Matriz.xlsx';
+    a.href=url;a.download=fn;a.click();
+    URL.revokeObjectURL(url);
+    showMsg('✔ Matriz descargada.');
+  }catch(e){showMsg('Error: '+e.message,'err');}
+}
+
+async function clearMatriz(){
+  if(!confirm(`¿Eliminar todos los ${matrizCount} registros? Esta acción no se puede deshacer.`))return;
+  const res=await fetch('/api/limpiar-matriz',{method:'POST'});
+  const data=await res.json();
+  matrizCount=0;
+  updateMatrizUI(0,[]);
+  showMsg('Matriz limpiada.','warn');render();
+}
+
+function nuevoRegistro(){
+  if(!confirm('¿Iniciar nuevo registro? Se perderán los datos actuales del formulario.'))return;
+  form={...form};
+  const keys=Object.keys(form);
+  keys.forEach(k=>{
+    if(typeof form[k]==='string')form[k]='';
+    else if(typeof form[k]==='boolean')form[k]=false;
+  });
+  form.actividades=["","","","","","",""];
+  form.riesgos=initRiesgos();
+  form.examenFisicoItems=initEFItems();
+  form.antLaborales=[{centro:"",actividades:"",anterior:false,actual:false,tiempo:"",incidente:false,accidente:false,ep:false,iesssi:false,iessno:false,fecha:"",especificar:""}];
+  form.examenes=[{nombre:"",fecha:"",resultado:""}];
+  form.diagnosticos=[{cie10:"",desc:"",tipo:""},{cie10:"",desc:"",tipo:""},{cie10:"",desc:"",tipo:""},{cie10:"",desc:"",tipo:""},{cie10:"",desc:"",tipo:""},{cie10:"",desc:"",tipo:""}];
+  form.examenFisicoRegiones={
+    "1. Piel":{checked:false,hallazgo:""},"2. Ojos":{checked:false,hallazgo:""},
+    "3. Oído":{checked:false,hallazgo:""},"4. Orofaringe":{checked:false,hallazgo:""},
+    "5. Nariz":{checked:false,hallazgo:""},"6. Cuello":{checked:false,hallazgo:""},
+    "7. Tórax/Mamas":{checked:false,hallazgo:""},"8. Tórax/Pulmones-Corazón":{checked:false,hallazgo:""},
+    "9. Abdomen":{checked:false,hallazgo:""},"10. Columna":{checked:false,hallazgo:""},
+    "11. Pelvis/Genitales":{checked:false,hallazgo:""},"12. Extremidades/Vascular":{checked:false,hallazgo:""},
+    "13. Neurológico":{checked:false,hallazgo:""}
+  };
+  form.nombreProf="Dr. Martín Lino Zambrano";
+  currentStep=0;render();
+}
+
+function updateMatrizUI(total){
+  // Solo actualizar elementos que aún existen
+  const panel=document.getElementById('mat-panel');
+  if(panel) panel.style.display=total>0?'block':'none';
+  if(total>0){
+    fetch('/api/conteo-matriz').then(r=>r.json()).then(data=>{
+      const el=document.getElementById('mat-names');
+      if(el) el.textContent=data.nombres.join('  |  ');
+    }).catch(()=>{});
+  }
+}
+
+// Init
+render();
+
+// Cargar conteo de la matriz al iniciar
+fetch('/api/conteo-matriz').then(r=>r.json()).then(data=>{
+  updateMatrizUI(data.total);
+}).catch(()=>{});
+
+// ── Dashboard ─────────────────────────────────────────────
+let dashVisible = false;
+
+function toggleDashboard(){
+  dashVisible = !dashVisible;
+  document.getElementById('dashboard-panel').style.display = dashVisible ? 'block' : 'none';
+  document.getElementById('form-content').style.display   = dashVisible ? 'none'  : 'block';
+  if(dashVisible){ showDTab('matriz'); }
+}
+
+function showDTab(tab){
+  ['matriz','dashboard','config'].forEach(t=>{
+    const el  = document.getElementById('dtab-'+t);
+    const btn = document.getElementById('dtab-btn-'+t);
+    if(el)  el.style.display  = t===tab ? 'block' : 'none';
+    if(btn) btn.classList.toggle('active', t===tab);
+  });
+  if(tab==='matriz')    { cargarMatriz(); }
+  if(tab==='dashboard') { if(matrizData.length===0){ cargarMatriz().then(()=>renderDashboard()); } else { renderDashboard(); } }
+  if(tab==='config')    { renderTablaECNT(); }
+}
+
+// ════════════════════════════════════════════════════════════
+//  MATRIZ — datos y renderizado
+// ════════════════════════════════════════════════════════════
+let matrizData = [];   // [{_id, nombre, edad, fechaIngreso, cargo, fechaEval, aptitud, dxs:[]}]
+let matEmpresa = '';
+
+function calcAnios(fi){
+  if(!fi) return '';
+  try{
+    const d=new Date(fi); if(isNaN(d)) return '';
+    const h=new Date(); let a=h.getFullYear()-d.getFullYear();
+    if(h.getMonth()<d.getMonth()||(h.getMonth()===d.getMonth()&&h.getDate()<d.getDate())) a--;
+    return a>=0?String(a):'';
+  }catch(e){ return ''; }
+}
+
+function getPlanN(){ return parseInt(localStorage.getItem('femo_planN')||'25'); }
+
+async function cargarMatriz(){
+  const tbody = document.getElementById('mat-tbody');
+  if(tbody) tbody.innerHTML='<tr><td colspan="12" style="text-align:center;padding:30px;color:#aaa"><div style="display:inline-block;width:20px;height:20px;border:3px solid #1556a0;border-top-color:transparent;border-radius:50%;animation:spin .8s linear infinite"></div></td></tr>';
+  try{
+    // Usar el endpoint más confiable
+    const r = await fetch('/api/matriz/lista');
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const raw = await r.json();
+    matrizData = Array.isArray(raw) ? raw : (raw.error ? [] : []);
+    // Guardar empresa si la tienen
+    if(!matEmpresa && matrizData.length && matrizData[0]['Empresa / institución']){
+      matEmpresa = matrizData[0]['Empresa / institución'];
+      const ei = document.getElementById('mat-empresa');
+      if(ei) ei.value = matEmpresa;
+    }
+    renderMatriz();
+  }catch(e){
+    console.error('cargarMatriz:', e);
+    if(tbody) tbody.innerHTML='<tr><td colspan="10" style="text-align:center;padding:24px;color:#e74c3c">Error: '+e.message+'<br><button onclick="cargarMatriz()" style="margin-top:8px;background:#1556a0;color:#fff;border:none;border-radius:5px;padding:5px 12px;cursor:pointer;font-size:11px">↺ Reintentar</button></td></tr>';
+  }
+}
+
+function matEmpresaChange(){
+  matEmpresa = document.getElementById('mat-empresa').value;
+  document.getElementById('mat-empresa-footer').textContent =
+    (matEmpresa||'CASISO S.A.S.')+' — Dr. Martín Lino Zambrano';
+}
+
+const APT_COL={
+  'APTO':                 {bg:'#e6f9ee',c:'#15692a',b:'#b7e4c7'},
+  'APTO EN OBSERVACIÓN':  {bg:'#fff8e1',c:'#856404',b:'#ffd666'},
+  'APTO CON LIMITACIONES':{bg:'#fff0e6',c:'#924e00',b:'#ffb380'},
+  'NO APTO':              {bg:'#fdecea',c:'#8b1a1a',b:'#f5b8b8'},
+};
+
+function renderMatriz(){
+  const tbody = document.getElementById('mat-tbody');
+  const cnt   = document.getElementById('mat-count');
+  const time  = document.getElementById('mat-time');
+  if(cnt)  cnt.textContent  = matrizData.length+' evaluado'+(matrizData.length!==1?'s':'');
+  if(time) time.textContent = 'Última carga: '+new Date().toLocaleTimeString('es-EC');
+
+  if(!matrizData.length){
+    tbody.innerHTML='<tr><td colspan="10" style="text-align:center;padding:40px;color:#bbb"><div style="font-size:32px;margin-bottom:8px">📋</div><div style="font-size:12px;font-weight:600;color:#888">La matriz está vacía</div><div style="font-size:11px;color:#aaa;margin-top:4px">Usa ➕ Nueva fila para ingresar datos manualmente</div></td></tr>';
+    return;
+  }
+
+  const EXCL=['z00','examen medico','examen ocupacional','examen general','evaluacion medica'];
+  tbody.innerHTML = matrizData.map((r,i)=>{
+    const rid  = r['_id'];
+    const nom  = r['NOMBRE COMPLETO']||'';
+    const edad = r['EDAD (años)']||'';
+    const fi   = r['Fecha de ingreso']||r['fechaIngreso']||'';
+    const anios= calcAnios(fi);
+    const cargo= r['Puesto / cargo (CIUO)']||'';
+    const fe   = r['Fecha de atención']||'';
+    const apt  = (r['Aptitud']||'').trim();
+    const aptU = apt.toUpperCase();
+    const as   = APT_COL[aptU]||{bg:'#f0f4f8',c:'#5a7a9a',b:'#d0dcea'};
+
+    // Recopilar todos los diagnósticos (hasta 6)
+    const dxList=[];
+    for(let n=1;n<=6;n++){
+      const cie =(r[`DIAGNÓSTICO ${n} CIE-10`]||'').trim();
+      const desc=(r[`DESCRIPCIÓN DX${n}`]||'').trim();
+      if(!cie) continue;
+      if(cie.toUpperCase().startsWith('Z')) continue;
+      const dl=desc.toLowerCase();
+      if(EXCL.some(ex=>dl.includes(ex))) continue;
+      const nombre=resolverECNT(cie)||desc||cie;
+      dxList.push({cie,nombre});
+    }
+    const dxHTML = dxList.length
+      ? dxList.map(d=>`<span style="display:inline-block;margin:1px 2px;padding:2px 7px;border-radius:3px;background:#ede9fe;color:#5b21b6;font-size:9px;font-weight:700;white-space:nowrap;border:1px solid #c4b5fd">${d.cie} — ${d.nombre}</span>`).join('')
+      : '<span style="color:#27ae60;font-size:10px;font-weight:600">✔ Paciente sano</span>';
+
+    const bg = i%2===0?'#fff':'#f8fafd';
+    return `<tr style="background:${bg}" onmouseover="this.style.background='#eef4ff'" onmouseout="this.style.background='${bg}'">
+      <td style="padding:8px 8px;border-bottom:1px solid #e8eef8;text-align:center;font-size:11px;font-weight:700;color:#9aabbc">${i+1}</td>
+      <td style="padding:8px 8px;border-bottom:1px solid #e8eef8;font-size:10px;color:#5a7a9a;min-width:100px;font-family:monospace">${r['N.° de historia clínica']||'—'}</td>
+      <td style="padding:8px 10px;border-bottom:1px solid #e8eef8;font-weight:700;font-size:12px;color:#1a2a3a;min-width:160px">${nom||'<span style="color:#ccc;font-style:italic">Sin nombre</span>'}</td>
+      <td style="padding:8px 8px;border-bottom:1px solid #e8eef8;text-align:center;font-size:13px;font-weight:700;color:#1556a0">${edad||'—'}</td>
+      <td style="padding:8px 8px;border-bottom:1px solid #e8eef8;text-align:center;font-size:10px;color:#5a7a9a">${fi?fi.substring(0,10):'—'}</td>
+      <td style="padding:8px 8px;border-bottom:1px solid #e8eef8;text-align:center;font-size:14px;font-weight:700;color:#1556a0">${anios||'—'}</td>
+      <td style="padding:8px 10px;border-bottom:1px solid #e8eef8;font-size:11px;font-weight:600;color:#1a2a3a">${cargo||'—'}</td>
+      <td style="padding:8px 8px;border-bottom:1px solid #e8eef8;text-align:center;font-size:10px;color:#5a7a9a">${fe?fe.substring(0,10):'—'}</td>
+      <td style="padding:8px 8px;border-bottom:1px solid #e8eef8;text-align:center">
+        <span style="display:inline-block;padding:3px 10px;border-radius:5px;font-size:9px;font-weight:700;background:${as.bg};color:${as.c};border:1px solid ${as.b};white-space:nowrap">${apt||'—'}</span>
+      </td>
+      <td style="padding:8px 8px;border-bottom:1px solid #e8eef8;text-align:center">
+        ${(()=>{
+          const t=r['Tipo de diagnóstico']||'';
+          const TC={'Paciente sano':{bg:'#e6f9ee',c:'#15692a'},'Enfermedad general':{bg:'#e8f0fb',c:'#1556a0'},'ECNT':{bg:'#f3e8ff',c:'#6d28d9'},'Enfermedad catastrófica':{bg:'#fdecea',c:'#8b1a1a'}};
+          const ts=TC[t]||null;
+          return t&&ts?`<span style="display:inline-block;padding:3px 8px;border-radius:4px;font-size:9px;font-weight:700;background:${ts.bg};color:${ts.c};white-space:nowrap">${t}</span>`:'<span style="color:#ccc;font-size:10px">—</span>';
+        })()}
+      </td>
+      <td style="padding:8px 10px;border-bottom:1px solid #e8eef8">${dxHTML}</td>
+      <td style="padding:8px 8px;border-bottom:1px solid #e8eef8;text-align:center;white-space:nowrap">
+        <button onclick="abrirEdicion(${rid})" style="background:#1556a0;color:#fff;border:none;border-radius:4px;padding:4px 8px;cursor:pointer;font-size:11px;margin-bottom:3px;display:block;width:100%;font-weight:600">✏️ Editar</button>
+        <button onclick="confirmarEliminar(${rid},'${nom.replace(/'/g,"\'")}'" style="background:#fff;color:#c0392b;border:1.5px solid #e8b4b4;border-radius:4px;padding:4px 8px;cursor:pointer;font-size:11px;display:block;width:100%;font-weight:600">🗑 Borrar</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// Agregar fila manual vacía
+function matAgregarFila(){
+  const fila = {
+    '_id': null, 'NOMBRE COMPLETO':'', 'EDAD (años)':'',
+    'Fecha de ingreso':'', 'Puesto / cargo (CIUO)':'', 'Fecha de atención':'',
+    'Aptitud':'', 'DIAGNÓSTICO 1 CIE-10':'', 'DESCRIPCIÓN DX1':'',
+    'Empresa / institución': matEmpresa,
+    'N°': matrizData.length+1,
+  };
+  // Abrir modal de edición para la nueva fila
+  editingRecord = fila;
+  const form = _buildEditForm(fila);
+  document.getElementById('modal-form').innerHTML = form;
+  document.getElementById('modal-edit').style.display = 'block';
+}
+
+// ════════════════════════════════════════════════════════════
+//  DASHBOARD — estadísticas calculadas DESDE matrizData
+// ════════════════════════════════════════════════════════════
+const _DCOL=['#1556a0','#27ae60','#e74c3c','#f39c12','#9b59b6','#1abc9c','#e67e22','#3498db','#e91e63','#00bcd4','#ff5722','#607d8b','#16a085','#d35400','#8e44ad'];
+const _ACOL={'APTO':'#27ae60','APTO EN OBSERVACIÓN':'#f39c12','APTO CON LIMITACIONES':'#e67e22','NO APTO':'#e74c3c'};
+const _SCOL={'Cardiovascular/Lipídico':'#e74c3c','Metabólico':'#f39c12','Hepático':'#e67e22','Hematológico':'#e91e63','Respiratorio/ORL':'#3498db','Auditivo':'#1abc9c','Digestivo':'#9b59b6','Urológico':'#2980b9','Osteomuscular':'#8e44ad','Neurológico':'#16a085'};
+
+const _CIE_SIS={'E78':'Cardiovascular/Lipídico','E66':'Metabólico','E79':'Metabólico','R74':'Hepático',
+  'D64':'Hematológico','D50':'Hematológico','R73':'Metabólico','E10':'Metabólico','E11':'Metabólico',
+  'I10':'Cardiovascular/Lipídico','E03':'Metabólico','M41':'Osteomuscular','H90':'Auditivo',
+  'B82':'Digestivo','J02':'Respiratorio/ORL','J45':'Respiratorio/ORL','N18':'Urológico',
+  'K74':'Hepático','F32':'Neurológico','F41':'Neurológico','M05':'Osteomuscular','J44':'Respiratorio/ORL'};
+
+function mkChart(id,type,labels,datasets,opts={}){
+  if(chartsCreados[id]){chartsCreados[id].destroy();}
+  const ctx=document.getElementById(id); if(!ctx) return;
+  chartsCreados[id]=new Chart(ctx,{type,data:{labels,datasets},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:8}}},...opts}});
+}
+
+function actualizarProgreso(){
+  const pN=parseInt(document.getElementById('inp-planificadas')?.value||'25');
+  localStorage.setItem('femo_planN',pN);
+  const tot=matrizData.length;
+  const pct=Math.min(Math.round(tot/pN*100),100);
+  const fill=document.getElementById('prog-barra');
+  const txt =document.getElementById('prog-texto');
+  if(fill){fill.style.width=pct+'%'; fill.style.background=pct>=100?'linear-gradient(90deg,#1e7a3a,#27ae60)':pct>=60?'linear-gradient(90deg,#c17a00,#f39c12)':'linear-gradient(90deg,#a01a1a,#e74c3c)';}
+  if(txt) txt.textContent=tot+' de '+pN+' ('+pct+'%) · '+Math.max(pN-tot,0)+' pendientes';
+}
+
+function renderDashboard(){
+  if(!matrizData.length){
+    document.getElementById('dash-kpis').innerHTML='<div style="grid-column:1/-1;text-align:center;padding:30px;color:#aaa"><div style="font-size:28px;margin-bottom:8px">📊</div><div style="font-size:12px">Agrega evaluaciones a la Matriz para ver el Dashboard</div></div>';
+    return;
+  }
+  const EXCL=['z00','examen medico','examen ocupacional','examen general','evaluacion medica'];
+  const tot=matrizData.length;
+  const p=n=>tot?Math.round(n/tot*100)+'%':'—';
+
+  // Contadores
+  const sx={}, ag={'18-25':0,'26-35':0,'36-45':0,'46-55':0,'56-65':0,'>65':0,'N/D':0};
+  const apt={}, ca={}, dx_cnt={}, sis_cnt={}, ecnt_cnt={};
+  const gs={}, gp={'Embarazada':0,'Adulto Mayor >65':0,'Discapacidad':0,'Enf. Catastrófica':0,'Con ECNT':0};
+  const imc_c={'Bajo peso':0,'Normal':0,'Sobrepeso':0,'Obesidad I':0,'Obesidad II':0,'N/D':0};
+  let sumAge=0,cntAge=0,ecntPacs=0;
+
+  matrizData.forEach(r=>{
+    // Sexo
+    const sex=(r['SEXO']||'N/D').trim();
+    sx[sex]=(sx[sex]||0)+1;
+    // Edad
+    const age=parseInt(r['EDAD (años)']||0);
+    if(age>0){sumAge+=age;cntAge++;}
+    const ag_k=age<26?'18-25':age<36?'26-35':age<46?'36-45':age<56?'46-55':age<66?'56-65':age>=66?'>65':'N/D';
+    ag[ag_k]++;
+    // Aptitud
+    const a=(r['Aptitud']||'N/D').trim();
+    apt[a]=(apt[a]||0)+1;
+    // Cargo
+    const c=(r['Puesto / cargo (CIUO)']||'N/D').trim();
+    ca[c]=(ca[c]||0)+1;
+    // Grupo sanguíneo
+    const g=(r['GRUPO SANGUÍNEO']||'N/D').trim();
+    gs[g]=(gs[g]||0)+1;
+    // IMC
+    const im=parseFloat(r['IMC (kg/m²)']||0);
+    const ik=im<=0?'N/D':im<18.5?'Bajo peso':im<25?'Normal':im<30?'Sobrepeso':im<35?'Obesidad I':'Obesidad II';
+    imc_c[ik]++;
+    // Grupos prioritarios
+    const gpS=r['GRUPO AT. PRIORITARIA']||'';
+    if(gpS.includes('Embarazada'))       gp['Embarazada']++;
+    if(gpS.includes('Mayor')||age>=65)   gp['Adulto Mayor >65']++;
+    if(gpS.includes('Discapacidad'))     gp['Discapacidad']++;
+    if(gpS.includes('Catastrófica'))     gp['Enf. Catastrófica']++;
+    // Diagnósticos
+    let hasEcnt=false;
+    for(let n=1;n<=6;n++){
+      const cie=(r[`DIAGNÓSTICO ${n} CIE-10`]||'').trim();
+      const desc=(r[`DESCRIPCIÓN DX${n}`]||'').trim();
+      if(!cie||cie.toUpperCase().startsWith('Z')) continue;
+      const dl=desc.toLowerCase();
+      if(EXCL.some(ex=>dl.includes(ex))) continue;
+      const key=cie+(desc?' — '+desc:'');
+      dx_cnt[key]=(dx_cnt[key]||0)+1;
+      const s3=cie.substring(0,3);
+      const sis=_CIE_SIS[s3]; if(sis) sis_cnt[sis]=(sis_cnt[sis]||0)+1;
+      const ecntN=resolverECNT(cie); if(ecntN){ecnt_cnt[ecntN]=(ecnt_cnt[ecntN]||0)+1;hasEcnt=true;}
+    }
+    if(hasEcnt){ecntPacs++;gp['Con ECNT']++;}
+  });
+
+  const avgAge=cntAge?Math.round(sumAge/cntAge):0;
+  const aptoN=apt['APTO']||0, obsN=apt['APTO EN OBSERVACIÓN']||0;
+  const limN=apt['APTO CON LIMITACIONES']||0, naN=apt['NO APTO']||0;
+
+  // KPIs
+  const pN=getPlanN();
+  if(document.getElementById('inp-planificadas')) document.getElementById('inp-planificadas').value=pN;
+  actualizarProgreso();
+
+  const kpis=[
+    {v:tot,           l:'Total evaluados',    c:'#1556a0'},
+    {v:aptoN,         l:'Apto',               c:'#27ae60',s:p(aptoN)},
+    {v:obsN,          l:'En observación',     c:'#f39c12',s:p(obsN)},
+    {v:limN,          l:'Con limitación',     c:'#e67e22',s:p(limN)},
+    {v:naN,           l:'No apto',            c:'#e74c3c',s:p(naN)},
+    {v:ecntPacs,      l:'Con ECNT',           c:'#8e44ad',s:p(ecntPacs)},
+    {v:avgAge||'—',   l:'Edad promedio',      c:'#2980b9',s:'años'},
+    {v:Object.keys(ca).length,l:'Cargos',    c:'#16a085'},
+  ];
+  document.getElementById('dash-kpis').innerHTML=kpis.map(k=>
+    `<div class="kpi-card"><div class="kpi-val" style="color:${k.c}">${k.v}</div><div class="kpi-lbl">${k.l}</div>${k.s?`<div style="font-size:9px;color:#999">${k.s}</div>`:''}</div>`
+  ).join('');
+
+  // Sexo
+  const sxK=Object.keys(sx),sxV=Object.values(sx),sxC=['#1556a0','#e91e63','#9b59b6'];
+  document.getElementById('leg-gen').innerHTML=sxK.map((k,i)=>`<span style="display:flex;align-items:center;gap:3px;font-size:10px;color:#444"><span style="width:8px;height:8px;border-radius:2px;background:${sxC[i]||'#ccc'}"></span>${k}: ${sxV[i]}</span>`).join('');
+  mkChart('ch-genero','doughnut',sxK,[{data:sxV,backgroundColor:sxC,borderWidth:0}],{cutout:'55%'});
+
+  // Edad
+  mkChart('ch-edad','bar',Object.keys(ag),[{label:'Personas',data:Object.values(ag),backgroundColor:_DCOL,borderRadius:4,borderWidth:0}],{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0,font:{size:10}}},x:{ticks:{font:{size:10}}}}});
+
+  // Aptitud
+  const aptK=Object.keys(apt),aptV=Object.values(apt);
+  document.getElementById('leg-apt').innerHTML=aptK.map((k,i)=>`<span style="display:flex;align-items:center;gap:3px;font-size:10px;color:#444"><span style="width:8px;height:8px;border-radius:2px;background:${_ACOL[k.toUpperCase()]||'#ccc'}"></span>${k}: ${aptV[i]}</span>`).join('');
+  mkChart('ch-aptitud','bar',aptK,[{label:'Personas',data:aptV,backgroundColor:aptK.map(k=>_ACOL[k.toUpperCase()]||'#ccc'),borderRadius:[0,4,4,0]}],{indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{precision:0,font:{size:10}}},y:{ticks:{font:{size:10}}}}});
+
+  // IMC
+  const imcC={'Bajo peso':'#3498db','Normal':'#27ae60','Sobrepeso':'#f39c12','Obesidad I':'#e67e22','Obesidad II':'#e74c3c','N/D':'#bdc3c7'};
+  mkChart('ch-imc','bar',Object.keys(imc_c),[{label:'Personas',data:Object.values(imc_c),backgroundColor:Object.keys(imc_c).map(k=>imcC[k]||'#ccc'),borderRadius:4,borderWidth:0}],{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0,font:{size:10}}},x:{ticks:{font:{size:10}}}}});
+
+  // Cargos
+  const caE=Object.entries(ca).sort((a,b)=>b[1]-a[1]).slice(0,12);
+  const caH=Math.max(caE.length*36+50,150); document.getElementById('box-cargos').style.height=caH+'px';
+  mkChart('ch-cargos','bar',caE.map(e=>e[0]),[{label:'Evaluados',data:caE.map(e=>e[1]),backgroundColor:'#1556a0',borderRadius:[0,4,4,0]}],{indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{precision:0,font:{size:10}}},y:{ticks:{font:{size:9}}}}});
+
+  // Diagnósticos CIE-10
+  const dxE=Object.entries(dx_cnt).sort((a,b)=>b[1]-a[1]).slice(0,12);
+  const dxH=Math.max(dxE.length*34+50,150); document.getElementById('box-dx').style.height=dxH+'px';
+  mkChart('ch-dx','bar',dxE.map(e=>e[0].length>50?e[0].substr(0,50)+'…':e[0]),[{label:'Casos',data:dxE.map(e=>e[1]),backgroundColor:'#8e44ad',borderRadius:[0,4,4,0]}],{indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{precision:0,font:{size:10}}},y:{ticks:{font:{size:9}}}}});
+
+  // Sistemas
+  const siE=Object.entries(sis_cnt).sort((a,b)=>b[1]-a[1]);
+  const siH=Math.max(siE.length*34+50,120); document.getElementById('box-sis').style.height=siH+'px';
+  mkChart('ch-sistemas','bar',siE.map(e=>e[0]),[{label:'Pacientes',data:siE.map(e=>e[1]),backgroundColor:siE.map(e=>_SCOL[e[0]]||'#607d8b'),borderRadius:[0,4,4,0]}],{indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{precision:0,font:{size:10}}},y:{ticks:{font:{size:10}}}}});
+
+  // ECNT
+  const ecE=Object.entries(ecnt_cnt).sort((a,b)=>b[1]-a[1]);
+  mkChart('ch-ecnt','bar',ecE.map(e=>e[0]),[{label:'Pacientes',data:ecE.map(e=>e[1]),backgroundColor:_DCOL,borderRadius:4,borderWidth:0}],{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0,font:{size:10}}},x:{ticks:{font:{size:10},maxRotation:25}}}});
+
+  // Grupos prioritarios
+  const gpK=Object.keys(gp),gpV=Object.values(gp);
+  mkChart('ch-gp','bar',gpK,[{label:'Personas',data:gpV,backgroundColor:['#e91e63','#f39c12','#3498db','#e74c3c','#8e44ad'],borderRadius:4,borderWidth:0}],{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0,font:{size:10}}},x:{ticks:{font:{size:10}}}}});
+
+  // Grupo sanguíneo
+  mkChart('ch-gs','bar',Object.keys(gs),[{label:'Personas',data:Object.values(gs),backgroundColor:_DCOL,borderRadius:4,borderWidth:0}],{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0,font:{size:10}}},x:{ticks:{font:{size:10}}}}});
+}
+
+// ════════════════════════════════════════════════════════════
+//  EDICIÓN Y ELIMINACIÓN
+// ════════════════════════════════════════════════════════════
+let allRegistros=[];  // alias para compatibilidad
+
+function _buildEditForm(rec){
+  const COLS=[
+    ['N.° de historia clínica','Cédula / N° Historia Clínica','cedula'],
+    ['NOMBRE COMPLETO','Nombre completo','text'],
+    ['SEXO','Sexo','sel:Hombre|Mujer|Otro'],
+    ['EDAD (años)','Edad (años)','number'],
+    ['GRUPO SANGUÍNEO','Grupo sanguíneo','text'],
+    ['Puesto / cargo (CIUO)','Cargo / Puesto','text'],
+    ['Empresa / institución','Empresa','text'],
+    ['Tipo de evaluación','Tipo evaluación','sel:Ingreso|Periódico|Reintegro|Retiro|Especial'],
+    ['Fecha de atención','Fecha evaluación','date'],
+    ['Fecha de ingreso','Fecha ingreso laboral','date'],
+    ['Temperatura (°C)','Temperatura °C','text'],
+    ['Presión arterial','Presión arterial','text'],
+    ['FC (lat/min)','FC lat/min','text'],
+    ['FR (fr/min)','FR fr/min','text'],
+    ['SpO₂ (%)','SpO₂ %','text'],
+    ['Peso (kg)','Peso kg','text'],
+    ['Talla (cm)','Talla cm','text'],
+    ['IMC (kg/m²)','IMC kg/m²','text'],
+    ['Perímetro abdominal (cm)','Perímetro abdominal','text'],
+    ['Aptitud','Aptitud médica','sel:APTO|APTO EN OBSERVACIÓN|APTO CON LIMITACIONES|NO APTO'],
+    ['Observaciones de aptitud','Observaciones aptitud','ta'],
+    ['Tipo de diagnóstico','Tipo de diagnóstico','sel:Paciente sano|Enfermedad general|Enfermedad crónica no transmisible|Enfermedad catastrófica'],
+    ['DIAGNÓSTICO 1 CIE-10','Dx1 CIE-10','text'],['DESCRIPCIÓN DX1','Dx1 Descripción','text'],
+    ['DIAGNÓSTICO 2 CIE-10','Dx2 CIE-10','text'],['DESCRIPCIÓN DX2','Dx2 Descripción','text'],
+    ['DIAGNÓSTICO 3 CIE-10','Dx3 CIE-10','text'],['DESCRIPCIÓN DX3','Dx3 Descripción','text'],
+    ['DIAGNÓSTICO 4 CIE-10','Dx4 CIE-10','text'],['DESCRIPCIÓN DX4','Dx4 Descripción','text'],
+    ['DIAGNÓSTICO 5 CIE-10','Dx5 CIE-10','text'],['DESCRIPCIÓN DX5','Dx5 Descripción','text'],
+    ['DIAGNÓSTICO 6 CIE-10','Dx6 CIE-10','text'],['DESCRIPCIÓN DX6','Dx6 Descripción','text'],
+    ['Recomendaciones','Recomendaciones','ta'],
+    ['Médico responsable','Médico responsable','text'],
+  ];
+  return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">'+
+    COLS.map(([k,l,t])=>{
+      const v=(rec[k]||'').toString().replace(/"/g,'&quot;').replace(/</g,'&lt;');
+      let inp;
+      if(t==='ta') inp=`<textarea oninput="editingRecord['${k}']=this.value" style="font-size:11px;border:1.5px solid #c8d8e8;border-radius:4px;padding:5px 8px;font-family:inherit;resize:vertical;min-height:50px;width:100%;box-sizing:border-box">${rec[k]||''}</textarea>`;
+      else if(t.startsWith('sel:')) inp=`<select oninput="editingRecord['${k}']=this.value" style="font-size:11px;border:1.5px solid #c8d8e8;border-radius:4px;padding:5px 8px;width:100%">${t.split(':')[1].split('|').map(o=>`<option${v===o?' selected':''}>${o}</option>`).join('')}</select>`;
+      else if(t==='cedula') inp=`<div style="display:flex;gap:6px"><input type="text" value="${v}" id="edit-cedula-inp" oninput="editingRecord['${k}']=this.value" style="flex:1;font-size:11px;border:1.5px solid #c8d8e8;border-radius:4px;padding:5px 8px;box-sizing:border-box" placeholder="Ingresa cédula y busca"><button type="button" onclick="buscarFichaPorCedula()" style="background:#1556a0;color:#fff;border:none;border-radius:4px;padding:5px 12px;cursor:pointer;font-size:11px;font-weight:700;white-space:nowrap">🔍 Cargar ficha</button></div>`;
+      else inp=`<input type="${t}" value="${v}" oninput="editingRecord['${k}']=this.value" style="font-size:11px;border:1.5px solid #c8d8e8;border-radius:4px;padding:5px 8px;width:100%;box-sizing:border-box">`;
+      const full=(t==='ta')?'grid-column:span 2':'';
+      return `<div style="${full}"><div class="fld"><label>${l}</label>${inp}</div></div>`;
+    }).join('')+'</div>';
+}
+
+function abrirEdicion(rid){
+  const rec = matrizData.find(r=>r._id==rid);
+  if(!rec) return;
+  editingRecord = {...rec};
+  document.getElementById('modal-form').innerHTML = _buildEditForm(editingRecord);
+  document.getElementById('modal-edit').style.display='block';
+}
+function cerrarModal(){ document.getElementById('modal-edit').style.display='none'; editingRecord=null; }
+
+async function guardarEdicion(){
+  if(!editingRecord) return;
+  try{
+    const payload={...editingRecord};
+    if(payload._id){
+      // Actualizar existente
+      const r=await fetch('/api/matriz/editar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+      const d=await r.json();
+      if(!d.ok) throw new Error(d.error||'Error');
+      showMsg('✓ Registro actualizado');
+    } else {
+      // Nuevo registro manual — usar endpoint que acepta campos del modal
+      const r=await fetch('/api/matriz/nuevo',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(editingRecord)});
+      if(!r.ok) throw new Error('Error HTTP '+r.status);
+      const d=await r.json();
+      if(!d.ok) throw new Error(d.error||'Error al guardar');
+      showMsg('✓ '+( d.nombre||'Registro')+' guardado en la matriz');
+    }
+    cerrarModal();
+    await cargarMatriz();
+    // Actualizar dashboard si está visible
+    if(document.getElementById('dtab-dashboard')?.style.display!=='none') renderDashboard();
+  }catch(e){ alert('Error: '+e.message); }
+}
+
+function confirmarEliminar(rid, nom){
+  const existing=document.getElementById('del-modal'); if(existing) existing.remove();
+  const m=document.createElement('div');
+  m.id='del-modal';
+  m.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  m.innerHTML=`<div style="background:#fff;border-radius:12px;padding:26px;max-width:400px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,.3);text-align:center">
+    <div style="font-size:36px;margin-bottom:10px">🗑️</div>
+    <h3 style="color:#1a2a3a;font-size:14px;margin:0 0 6px">¿Eliminar este registro?</h3>
+    <p style="color:#5a7a9a;font-size:12px;margin:0 0 6px;font-weight:600">${nom}</p>
+    <p style="color:#e74c3c;font-size:11px;margin:0 0 20px;background:#fdecea;padding:7px 12px;border-radius:5px">⚠ Esta acción no se puede deshacer.</p>
+    <div style="display:flex;gap:10px;justify-content:center">
+      <button onclick="document.getElementById('del-modal').remove()" style="flex:1;padding:9px 16px;border:1.5px solid #d0dcea;border-radius:6px;background:#fff;color:#5a7a9a;cursor:pointer;font-size:12px;font-weight:700">Cancelar</button>
+      <button onclick="ejecutarEliminar(${rid},'${nom.replace(/'/g,"\'")}');document.getElementById('del-modal').remove()" style="flex:1;padding:9px 16px;border:none;border-radius:6px;background:#c0392b;color:#fff;cursor:pointer;font-size:12px;font-weight:700">Sí, eliminar</button>
+    </div>
+  </div>`;
+  document.body.appendChild(m);
+  m.addEventListener('click',e=>{if(e.target===m)m.remove();});
+}
+
+async function ejecutarEliminar(rid, nom){
+  try{
+    const r=await fetch(`/api/matriz/eliminar/${rid}`,{method:'DELETE'});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const d=await r.json();
+    if(d.ok){
+      showMsg('🗑 Registro de '+nom+' eliminado','warn');
+      await cargarMatriz();
+    } else { alert('Error: '+(d.error||'desconocido')); }
+  }catch(e){ alert('Error: '+e.message); }
+}
+
+function eliminarReg(rid,nom){ confirmarEliminar(rid,nom); }
+
+// Auto-refresh matriz after agregar
+const _origAddToMatriz = typeof addToMatriz!=='undefined' ? addToMatriz : null;
+
+// ════════════════════════════════════════════════════════════
+//  ECNT CONFIG
+// ════════════════════════════════════════════════════════════
+const ECNT_DEFAULT={'E78':'Dislipidemia','E66':'Obesidad','E79':'Hiperuricemia','R74':'Enzimas hepáticas ↑','D64':'Anemia crónica','D50':'Anemia ferropénica','D51':'Anemia B12','R73':'Prediabetes','E10':'Diabetes tipo 1','E11':'Diabetes tipo 2','E14':'Diabetes','I10':'HTA esencial','I11':'HTA con cardiopatía','I15':'HTA secundaria','E03':'Hipotiroidismo','E05':'Hipertiroidismo','M41':'Escoliosis','M54':'Dorsalgia crónica','H90':'Hipoacusia','H91':'Hipoacusia','B82':'Parasitosis','B80':'Oxiuriasis','J45':'Asma','N18':'Enf. renal crónica','K21':'ERGE','K74':'Cirrosis','F32':'Depresión','F41':'Ansiedad','M05':'Artritis reumatoide','J44':'EPOC','I25':'Cardiopatía isquémica','I50':'Insuf. cardíaca'};
+function getECNTMap(){ try{const s=localStorage.getItem('femo_ecnt_config'); return s?JSON.parse(s):{...ECNT_DEFAULT};}catch(e){return{...ECNT_DEFAULT};} }
+function saveECNTMap(m){ localStorage.setItem('femo_ecnt_config',JSON.stringify(m)); }
+function resolverECNT(cie){
+  const map=getECNTMap(); const c=(cie||'').trim().toUpperCase();
+  if(map[c]) return map[c];
+  for(let l=c.length-1;l>=1;l--){ const p=c.substring(0,l); if(map[p]) return map[p]; }
+  return null;
+}
+function renderTablaECNT(){
+  const map=getECNTMap(); const entries=Object.entries(map).sort((a,b)=>a[0].localeCompare(b[0]));
+  const rows=entries.map(([cie,n])=>`<tr><td style="padding:6px 8px;border-bottom:1px solid #e8eef8"><code style="background:#ede9fe;color:#5b21b6;padding:2px 6px;border-radius:3px;font-size:11px;font-weight:700">${cie}</code></td><td style="padding:6px 8px;border-bottom:1px solid #e8eef8;font-size:11px">${n}</td><td style="padding:6px 8px;border-bottom:1px solid #e8eef8;text-align:right"><button onclick="eliminarECNT('${cie}')" style="background:none;border:1px solid #f5b8b8;border-radius:4px;color:#c0392b;cursor:pointer;font-size:10px;padding:2px 7px;font-weight:700">✕</button></td></tr>`).join('');
+  document.getElementById('tabla-ecnt').innerHTML=`<div style="font-size:10px;color:#9aabbc;margin-bottom:5px;font-weight:700">${entries.length} ECNT</div><div style="overflow-y:auto;max-height:280px;border:1px solid #e8eef8;border-radius:5px"><table style="width:100%;border-collapse:collapse"><thead><tr style="background:#f0f4f8"><th style="padding:6px 8px;text-align:left;font-size:9px;font-weight:700;color:#5a7a9a;border-bottom:1px solid #e8eef8">CIE-10</th><th style="padding:6px 8px;text-align:left;font-size:9px;font-weight:700;color:#5a7a9a;border-bottom:1px solid #e8eef8">ECNT</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+function agregarECNT(){ const cie=(document.getElementById('new-cie').value||'').trim().toUpperCase(); const n=(document.getElementById('new-ecnt-nombre').value||'').trim(); if(!cie||!n){alert('Completa CIE-10 y nombre.');return;} const m=getECNTMap(); m[cie]=n; saveECNTMap(m); document.getElementById('new-cie').value=''; document.getElementById('new-ecnt-nombre').value=''; renderTablaECNT(); showMsg('✓ '+n+' ('+cie+') añadido'); }
+function eliminarECNT(cie){ const m=getECNTMap(); delete m[cie]; saveECNTMap(m); renderTablaECNT(); }
+function resetECNT(){ if(!confirm('¿Restaurar ECNT por defecto?'))return; localStorage.removeItem('femo_ecnt_config'); renderTablaECNT(); showMsg('✓ ECNT restauradas'); }
+
+// Compatibilidad con llamadas antiguas
+function cargarRegistros(){ cargarMatriz(); }
+function cargarDashboard(){ if(dashVisible){ cargarMatriz(); } }
+function filtrarRegistros(){}
+function renderEstadisticas(){}
+function actualizarProgreso2(){ actualizarProgreso(); }
+
+
+// ── BUSCAR FICHA POR CÉDULA — auto-llena el modal desde borrador ──
+async function buscarFichaPorCedula(){
+  const inp = document.getElementById('edit-cedula-inp');
+  const cedula = (inp?.value||'').trim();
+  if(!cedula){ alert('Ingresa la cédula primero.'); return; }
+  const btn = inp.nextElementSibling;
+  if(btn){ btn.disabled=true; btn.textContent='⏳ Buscando...'; }
+  try{
+    const r = await fetch('/api/borrador/'+encodeURIComponent(cedula));
+    const d = await r.json();
+    if(!d.ok || !d.data){
+      if(btn){ btn.disabled=false; btn.textContent='🔍 Cargar ficha'; }
+      alert('No se encontró ninguna ficha guardada para la cédula: '+cedula+'\n\nAsegúrate de haber guardado el borrador desde el formulario.');
+      return;
+    }
+    // Mapear los datos del borrador al editingRecord
+    const fd = d.data;
+    const APTMAP={'APTO':'APTO','APTO_OBS':'APTO EN OBSERVACIÓN','APTO_LIM':'APTO CON LIMITACIONES','NO_APTO':'NO APTO'};
+    const nom = [fd.primerApellido||'',fd.segundoApellido||'',fd.primerNombre||'',fd.segundoNombre||''].filter(Boolean).join(' ').trim();
+    editingRecord['N.° de historia clínica'] = cedula;
+    editingRecord['NOMBRE COMPLETO']         = nom;
+    editingRecord['SEXO']                    = fd.sexo||'';
+    editingRecord['EDAD (años)']             = fd.edad||'';
+    editingRecord['FECHA NACIMIENTO']        = fd.fechaNacimiento||'';
+    editingRecord['GRUPO SANGUÍNEO']         = fd.grupoSanguineo||'';
+    editingRecord['Empresa / institución']   = fd.institucion||fd.establecimiento||'';
+    editingRecord['Puesto / cargo (CIUO)']   = fd.puestoCIUO||'';
+    editingRecord['Tipo de evaluación']      = fd.tipoEvaluacion||'';
+    editingRecord['Fecha de atención']       = fd.fechaAtencion||'';
+    editingRecord['Fecha de ingreso']        = fd.fechaIngreso||'';
+    editingRecord['Temperatura (°C)']        = fd.temperatura||'';
+    editingRecord['Presión arterial']        = fd.pa||'';
+    editingRecord['FC (lat/min)']            = fd.fc||'';
+    editingRecord['FR (fr/min)']             = fd.fr||'';
+    editingRecord['SpO₂ (%)']               = fd.spo2||'';
+    editingRecord['Peso (kg)']              = fd.peso||'';
+    editingRecord['Talla (cm)']             = fd.talla||'';
+    editingRecord['IMC (kg/m²)']            = fd.imc||'';
+    editingRecord['Perímetro abdominal (cm)']= fd.perAbdominal||'';
+    editingRecord['Aptitud']                 = APTMAP[fd.aptitud||'']||fd.aptitud||'';
+    editingRecord['Observaciones de aptitud']= fd.aptitudObs||'';
+    editingRecord['Recomendaciones']         = fd.recomendaciones||'';
+    editingRecord['Médico responsable']      = fd.nombreProf||'';
+    // Grupos prioritarios
+    const gps=[];
+    if(fd.embarazada) gps.push('Embarazada');
+    if(fd.discapacidad) gps.push('Discapacidad');
+    if(fd.enfCatastrofica) gps.push('Enf.Catastrófica');
+    if(fd.adultoMayor) gps.push('Adulto Mayor');
+    editingRecord['GRUPO AT. PRIORITARIA'] = gps.join(', ')||'Ninguno';
+    // Diagnósticos (hasta 6)
+    const dxs = fd.diagnosticos||[];
+    for(let n=0;n<6;n++){
+      const dx=dxs[n]||{};
+      editingRecord[`DIAGNÓSTICO ${n+1} CIE-10`] = dx.cie10||'';
+      editingRecord[`DESCRIPCIÓN DX${n+1}`]       = dx.desc||'';
+    }
+    // Reconstruir el formulario con los datos cargados
+    document.getElementById('modal-form').innerHTML = _buildEditForm(editingRecord);
+    showMsg('✓ Ficha de '+nom+' cargada automáticamente');
+  }catch(e){
+    alert('Error al buscar: '+e.message);
+  }
+  if(btn){ btn.disabled=false; btn.textContent='🔍 Cargar ficha'; }
+}
+
+
+// ── IMPORTAR BORRADORES A LA MATRIZ ──────────────────────────
+async function importarBorradores(){
+  const btn = event?.target;
+  if(btn){ btn.disabled=true; btn.textContent='⏳ Importando...'; }
+  try{
+    const r = await fetch('/api/importar-borradores', {method:'POST'});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const d = await r.json();
+    if(d.ok){
+      const msg = `✓ ${d.importados} fichas importadas, ${d.actualizados} actualizadas. Total en matriz: ${d.total}`;
+      showMsg(msg);
+      await cargarMatriz();
+    } else {
+      alert('Error al importar: '+(d.error||'desconocido'));
+    }
+  }catch(e){ alert('Error: '+e.message); }
+  if(btn){ btn.disabled=false; btn.textContent='⬆ Importar borradores'; }
+}
+
+</script>
+</body>
