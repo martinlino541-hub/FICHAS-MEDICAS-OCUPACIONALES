@@ -1,0 +1,2667 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="theme-color" content="#1556a0"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="FichaOcup"/>
+<link rel="manifest" href="/manifest.json"/>
+<link rel="apple-touch-icon" href="/icon-192.png"/>
+<link rel="icon" href="/favicon.ico"/>
+<title>Ficha Médica Ocupacional – CASISO S.A.S.</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Segoe UI,Arial,sans-serif;font-size:13px;background:#f0f4f8;color:#1a2a3a}
+.hdr{background:linear-gradient(135deg,#0a2d5a,#1556a0);color:#fff;padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
+.hdr-title{font-size:15px;font-weight:700;letter-spacing:.3px}
+.hdr-sub{font-size:10px;color:#a8c8ef;margin-top:2px}
+.hdr-right{display:flex;gap:8px;align-items:center}
+.badge{background:#1a4a80;color:#c8dfef;font-size:11px;padding:4px 10px;border-radius:20px;font-weight:600}
+.btn-hdr{font-size:11px;padding:5px 12px;border-radius:5px;border:none;cursor:pointer;font-weight:600}
+.btn-g{background:#1a7a3a;color:#fff} .btn-g:hover{background:#155f2d} .btn-g:disabled{opacity:.4;cursor:default}
+.btn-r{background:#7a1a1a;color:#fff} .btn-r:hover{background:#5a1414} .btn-r:disabled{opacity:.4;cursor:default}
+.steps-wrap{background:#fff;border-bottom:2px solid #d0dcea;overflow-x:auto}
+.steps{display:flex;min-width:max-content}
+.step-btn{padding:9px 15px;font-size:11px;font-weight:600;border:none;border-bottom:3px solid transparent;background:transparent;cursor:pointer;color:#6a8aaa;white-space:nowrap;display:flex;align-items:center;gap:5px}
+.step-btn.active{border-bottom-color:#1556a0;color:#1556a0;background:#f0f6ff}
+.step-btn:hover:not(.active){background:#f5f8fc;color:#1556a0}
+.sn{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;font-size:10px;background:#d0dcea;color:#1a2a3a;flex-shrink:0}
+.step-btn.active .sn{background:#1556a0;color:#fff}
+.msg-bar{padding:8px 20px;font-size:12px;font-weight:500;display:none;border-left:4px solid #1e7a3a;background:#e8f5ee;color:#1e5530}
+.msg-bar.warn{border-left-color:#c17a00;background:#fff8e8;color:#6a4a00}
+.msg-bar.err{border-left-color:#a01a1a;background:#fceaea;color:#701010}
+.main{max-width:1000px;margin:0 auto;padding:14px}
+.card{background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:10px;overflow:hidden}
+.sec{background:#1556a0;color:#fff;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:7px 14px}
+.sec.sub{background:#2a6abf}.sec.pink{background:#8a3060}.sec.teal{background:#0a6a6a}.sec.gray{background:#3a4a5a}
+.sb{padding:12px 14px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px}
+.c2{grid-column:span 2}.c3{grid-column:span 3}.c4{grid-column:span 4}
+.fld{display:flex;flex-direction:column;gap:3px}
+.fld label{font-size:10px;font-weight:700;color:#5a7a9a;text-transform:uppercase;letter-spacing:.3px}
+.fld input,.fld select,.fld textarea{border:1.5px solid #c8d8e8;border-radius:4px;padding:5px 8px;font-size:12px;font-family:inherit;background:#fff;color:#1a2a3a;outline:none;width:100%;transition:border .12s}
+.fld input:focus,.fld select:focus,.fld textarea:focus{border-color:#1556a0;box-shadow:0 0 0 2px rgba(21,86,160,.12)}
+.fld input[readonly]{background:#f0f4f8;color:#1556a0;font-weight:700}
+.fld textarea{resize:vertical;min-height:55px}
+.imc-badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;margin-top:5px}
+.chk-g{display:flex;flex-wrap:wrap;gap:10px;padding:5px 0}
+.chi{display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer}
+.chi input{width:13px;height:13px;accent-color:#1556a0;flex-shrink:0}
+.sub-lbl{font-size:11px;font-weight:700;color:#1556a0;text-transform:uppercase;letter-spacing:.3px;margin-top:10px;margin-bottom:5px;padding-bottom:3px;border-bottom:1.5px solid #d0dcea}
+.tbl{width:100%;border-collapse:collapse;font-size:11px}
+.tbl th{background:#e8eef8;color:#1556a0;font-weight:700;padding:5px 7px;text-align:left;border:1px solid #c8d8e8;font-size:10px;text-transform:uppercase}
+.tbl td{border:1px solid #d8e4f0;padding:3px 5px;vertical-align:middle}
+.tbl td input{border:none;width:100%;font-size:11px;background:transparent;outline:none;padding:2px 4px;color:#1a2a3a}
+.tbl tr:nth-child(even) td{background:#f8fafd}
+.tbl td.cat{font-weight:700;font-size:10px;color:#1556a0;vertical-align:top;padding-top:6px;background:#f0f6ff;white-space:nowrap}
+.apt-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.apt-opt{display:flex;align-items:center;gap:8px;padding:9px 12px;border:2px solid #c8d8e8;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;transition:all .12s}
+.apt-opt:hover{border-color:#1556a0}
+.apt-APTO{border-color:#1e7a3a;background:#eaf6ee;color:#1e5530}
+.apt-APTO_OBS{border-color:#c17a00;background:#fff8e8;color:#7a4a00}
+.apt-APTO_LIM{border-color:#c15000;background:#fff3ec;color:#7a3000}
+.apt-NO_APTO{border-color:#a01a1a;background:#fceaea;color:#701010}
+.dl-box{background:#f0f6ff;border:2px dashed #90b0d8;border-radius:8px;padding:14px;margin-top:12px}
+.dl-title{font-size:12px;font-weight:700;color:#1556a0;text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px}
+.dl-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.btn-dl{padding:9px 12px;border-radius:5px;border:none;cursor:pointer;font-size:12px;font-weight:700;width:100%;transition:all .12s}
+.btn-dl:disabled{opacity:.5;cursor:default}
+.btn-ficha{background:#1556a0;color:#fff}.btn-ficha:hover:not(:disabled){background:#0e3d78}
+.btn-cert{background:#1e7a3a;color:#fff}.btn-cert:hover:not(:disabled){background:#155a2a}
+.btn-mat{background:#5a1a8a;color:#fff;width:100%;padding:9px;border-radius:5px;border:none;cursor:pointer;font-size:12px;font-weight:700;margin-bottom:7px}
+.btn-mat:hover{background:#40137a}
+.btn-nuevo{background:#fff;color:#3a5a7a;border:1.5px solid #c8d8e8;width:100%;padding:7px;border-radius:5px;cursor:pointer;font-size:12px;font-weight:600}
+.nav-bar{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding:10px 14px;background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.btn-nav{font-size:12px;padding:7px 20px;border-radius:5px;border:1.5px solid #c8d8e8;cursor:pointer;background:#fff;color:#3a5a7a;font-weight:600}
+.btn-nav:disabled{opacity:.35;cursor:default}
+.btn-nav.primary{background:#1556a0;color:#fff;border-color:#1556a0}
+.btn-nav.primary:hover:not(:disabled){background:#0e3d78}
+.step-info{font-size:11px;color:#6a8aaa;font-weight:600}
+.add-btn{font-size:11px;color:#1556a0;background:none;border:none;cursor:pointer;padding:3px 0;font-weight:600;text-decoration:underline;text-underline-offset:2px;margin-top:5px}
+.rm-btn{background:none;border:none;cursor:pointer;color:#a01a1a;font-size:15px;font-weight:700;padding:0 3px}
+.note{font-size:11px;color:#5a7a9a;padding:5px 9px;background:#f0f6ff;border-radius:4px;border-left:3px solid #90b0d8;margin-bottom:7px}
+.lab-row{border:1px solid #d8e4f0;border-radius:5px;padding:8px;margin-bottom:7px;background:#f8fafd}
+.ic{display:flex;flex-wrap:wrap;gap:8px;margin-top:5px}
+.ic label{display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer}
+.mat-panel{background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.08);padding:12px;margin-bottom:10px;border-left:4px solid #5a1a8a}
+.mat-title{font-size:12px;font-weight:700;color:#5a1a8a;margin-bottom:3px}
+.mat-sub{font-size:11px;color:#6a5a8a}
+.dash-card{background:#fff;border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.10);padding:14px}
+.dash-card-title{font-size:13px;font-weight:700;color:#1556a0;margin-bottom:10px}
+.kpi-card{background:#fff;border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.10);padding:12px;text-align:center}
+.kpi-val{font-size:28px;font-weight:800;color:#1556a0}
+.kpi-lbl{font-size:11px;color:#666;margin-top:2px}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:5px}
+.btn-borrador{background:#0e7a5a;color:#fff;width:100%;padding:9px;border-radius:5px;border:none;cursor:pointer;font-size:12px;font-weight:700;margin-bottom:7px}
+.btn-borrador:hover:not(:disabled){background:#0a5c43}
+.btn-eliminar-borrador{background:#c0392b;color:#fff;width:100%;padding:9px;border-radius:5px;border:none;cursor:pointer;font-size:12px;font-weight:700;margin-bottom:7px;display:none}
+.btn-eliminar-borrador:hover{background:#922b21}
+.borrador-banner{background:#e6f7f1;border:1.5px solid #0e7a5a;border-radius:6px;padding:7px 12px;font-size:11px;color:#0a5c43;font-weight:700;margin-bottom:8px;display:none;text-align:center}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.dtab{padding:10px 18px;font-size:12px;font-weight:600;border:none;border-bottom:3px solid transparent;background:transparent;cursor:pointer;color:#6a8aaa;white-space:nowrap;transition:all .15s}
+.dtab:hover:not(.active){background:#f0f6ff;color:#1556a0}
+.dtab.active{border-bottom-color:#1556a0;color:#1556a0;background:#f0f6ff}
+.dreg-tbl{width:100%;border-collapse:collapse;font-size:11px;min-width:1800px}
+.dreg-tbl th{background:#1556a0;color:#fff;padding:7px 8px;text-align:left;border-bottom:2px solid #0e3d78;border-right:1px solid #1e6bc5;font-size:9px;font-weight:700;text-transform:uppercase;white-space:nowrap;position:sticky;top:0;z-index:10}
+.dreg-tbl th.th-group{background:#0a2d5a;font-size:8px;text-align:center;padding:4px 6px;border-right:2px solid #1e6bc5;letter-spacing:.05em}
+.dreg-tbl th.frozen{position:sticky;left:0;z-index:20;background:#1556a0}
+.dreg-tbl td{padding:5px 8px;border-bottom:1px solid #e8eef8;border-right:1px solid #f0f4f8;vertical-align:middle;font-size:11px}
+.dreg-tbl td.frozen{position:sticky;left:0;z-index:5;background:#fff;font-weight:700;border-right:2px solid #d0dcea}
+.dreg-tbl tr:hover td{background:#f0f6ff}
+.dreg-tbl tr:hover td.frozen{background:#e8f0fb}
+.dreg-tbl td.num{text-align:center;color:#5a7a9a;font-weight:700;font-size:10px}
+.dreg-tbl td.ctr{text-align:center}
+.dreg-tbl td.sm{font-size:10px;color:#5a7a9a}
+.dreg-tbl td.vital{text-align:center;font-size:10px;font-family:monospace;color:#1a4a80}
+.mat-wrap{overflow-x:auto;overflow-y:auto;max-height:75vh;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.col-toggle{display:flex;flex-wrap:wrap;gap:5px;padding:10px 14px;background:#fff;border-radius:8px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,.07)}
+.col-btn{padding:3px 10px;font-size:10px;font-weight:700;border-radius:12px;border:1.5px solid #c8d8e8;cursor:pointer;background:#fff;color:#5a7a9a;transition:all .15s}
+.col-btn.on{background:#1556a0;color:#fff;border-color:#1556a0}
+.d-modal-bg{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:2000;overflow-y:auto;padding:20px}
+.d-modal{max-width:720px;margin:20px auto;background:#fff;border-radius:10px;padding:22px;box-shadow:0 8px 30px rgba(0,0,0,.2)}
+
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div>
+    <div class="hdr-title">🏥 FICHA MÉDICA OCUPACIONAL</div>
+    <div class="hdr-sub">SNS-MSP/HCU-form.123/2025 &nbsp;|&nbsp; CASISO S.A.S. &nbsp;|&nbsp; Dr. Martín Lino Zambrano</div>
+  </div>
+  <div class="hdr-right">
+    <button class="btn-hdr" style="background:#1a6a8a" onclick="toggleDashboard()">📈 Estadísticas</button>
+  </div>
+</div>
+
+<div class="steps-wrap"><div class="steps" id="steps-bar"></div></div>
+<div class="msg-bar" id="msg-bar"></div>
+
+<div class="main">
+
+
+  <!-- DASHBOARD ESTADÍSTICAS — COMPLETO -->
+  <!-- ══════════════════════════════════════════════════════
+       PANEL ESTADÍSTICAS / DASHBOARD
+  ═══════════════════════════════════════════════════════ -->
+  <div id="dashboard-panel" style="display:none;background:#f0f4f8;min-height:calc(100vh - 80px)">
+
+    <!-- Header -->
+    <div style="background:linear-gradient(135deg,#0a2d5a,#1556a0);color:#fff;padding:11px 18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <div>
+        <div style="font-size:14px;font-weight:700">📊 Estadísticas — CASISO S.A.S.</div>
+        <div style="font-size:10px;color:#a8c8ef;margin-top:1px">Dr. Martín Lino Zambrano · Evaluaciones 2026</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <button onclick="toggleDashboard()" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:5px;padding:6px 14px;cursor:pointer;font-size:12px;font-weight:700">✕ Cerrar</button>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div style="background:#fff;border-bottom:2px solid #d0dcea;display:flex;overflow-x:auto">
+      <button class="dtab active" id="dtab-btn-matriz" onclick="showDTab('matriz')">📋 Todos</button>
+      <button class="dtab" id="dtab-btn-ingreso" onclick="showDTab('ingreso')" style="border-left:3px solid #27ae60">🟢 Ingreso</button>
+      <button class="dtab" id="dtab-btn-periodico" onclick="showDTab('periodico')" style="border-left:3px solid #1556a0">🔵 Periódico</button>
+      <button class="dtab" id="dtab-btn-reintegro" onclick="showDTab('reintegro')" style="border-left:3px solid #f39c12">🟡 Reintegro</button>
+      <button class="dtab" id="dtab-btn-egreso" onclick="showDTab('egreso')" style="border-left:3px solid #e74c3c">🔴 Egreso/Retiro</button>
+      <button class="dtab" id="dtab-btn-dashboard" onclick="showDTab('dashboard')">📈 Dashboard</button>
+    </div>
+
+    <!-- ═══════════════ TAB: MATRIZ ═══════════════ -->
+    <div id="dtab-matriz" style="padding:14px">
+
+      <!-- Empresa header -->
+      <div style="background:#fff;border-radius:10px;padding:12px 16px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.07);display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:240px">
+          <span style="font-size:11px;font-weight:700;color:#5a7a9a;white-space:nowrap">EMPRESA:</span>
+          <input id="mat-empresa" type="text" placeholder="Nombre de la empresa evaluada"
+            value="" oninput="matEmpresaChange()"
+            style="flex:1;font-size:13px;font-weight:700;color:#1556a0;border:1.5px solid #d0dcea;border-radius:6px;padding:6px 10px;outline:none">
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span id="mat-count" style="font-size:11px;color:#6a8aaa;font-weight:700;background:#f0f4f8;padding:4px 10px;border-radius:10px">0 evaluados</span>
+          <button onclick="matAgregarFila()" style="background:#27ae60;color:#fff;border:none;border-radius:6px;padding:7px 13px;cursor:pointer;font-size:11px;font-weight:700;white-space:nowrap">➕ Nueva fila</button>
+          <button onclick="cargarMatriz(true)" style="background:#1556a0;color:#fff;border:none;border-radius:6px;padding:7px 13px;cursor:pointer;font-size:11px;font-weight:700">↺ Recargar</button>
+        <button onclick="debugMatriz()" style="background:#888;color:#fff;border:none;border-radius:6px;padding:7px 13px;cursor:pointer;font-size:11px;font-weight:700">🔍 Debug</button>
+        </div>
+      </div>
+
+      <!-- Tabla matriz -->
+      <div style="background:#fff;border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.08);overflow:hidden">
+        <div style="overflow-x:auto;overflow-y:auto;max-height:70vh">
+          <table id="mat-table" style="width:100%;border-collapse:collapse;font-size:11px;min-width:1100px">
+            <thead>
+              <!-- Fila títulos -->
+              <tr style="background:linear-gradient(135deg,#0a2d5a,#1556a0)">
+                <th style="padding:9px 8px;color:rgba(255,255,255,.7);font-size:9px;font-weight:700;text-transform:uppercase;white-space:nowrap;width:36px">#</th>
+                <th style="padding:9px 10px;color:#fff;font-size:9px;font-weight:700;text-transform:uppercase;text-align:left;min-width:110px">Cédula</th>
+                <th style="padding:9px 10px;color:#fff;font-size:9px;font-weight:700;text-transform:uppercase;text-align:left;min-width:170px">Nombres y Apellidos</th>
+                <th style="padding:9px 8px;color:#fff;font-size:9px;font-weight:700;text-transform:uppercase;text-align:center;width:50px">Edad</th>
+                <th style="padding:9px 8px;color:#fff;font-size:9px;font-weight:700;text-transform:uppercase;text-align:center;min-width:95px">Fecha Ingreso</th>
+                <th style="padding:9px 8px;color:#fff;font-size:9px;font-weight:700;text-transform:uppercase;text-align:center;width:55px">Años Lab.</th>
+                <th style="padding:9px 10px;color:#fff;font-size:9px;font-weight:700;text-transform:uppercase;text-align:left;min-width:140px">Cargo</th>
+                <th style="padding:9px 8px;color:#fff;font-size:9px;font-weight:700;text-transform:uppercase;text-align:center;min-width:100px">Grupo Vulnerab.</th>
+                <th style="padding:9px 8px;color:#fff;font-size:9px;font-weight:700;text-transform:uppercase;text-align:center;min-width:95px">Fecha Evaluación</th>
+                <th style="padding:9px 8px;color:#fff;font-size:9px;font-weight:700;text-transform:uppercase;text-align:center;min-width:90px">Tipo Eval.</th>
+                <th style="padding:9px 8px;color:#fff;font-size:9px;font-weight:700;text-transform:uppercase;text-align:center;min-width:120px">Aptitud</th>
+                <th style="padding:9px 10px;color:#fff;font-size:9px;font-weight:700;text-transform:uppercase;text-align:left;min-width:260px">Diagnósticos</th>
+                <th style="padding:9px 8px;color:#a8d8ff;font-size:9px;font-weight:700;text-transform:uppercase;text-align:center;min-width:80px">📍 Ciudad</th>
+                <th style="padding:9px 8px;color:#a8ffcc;font-size:9px;font-weight:700;text-transform:uppercase;text-align:center;min-width:85px">📊 Dashboard</th>
+                <th style="padding:9px 8px;color:#fff;font-size:9px;font-weight:700;text-transform:uppercase;text-align:center;width:70px">Acciones</th>
+              </tr>
+              <!-- Fila de filtros -->
+              <tr style="background:#e8eef8" id="mat-filtros-row">
+                <td colspan="6" style="padding:5px 8px">
+                  <input id="mf-buscar" type="text" placeholder="🔍 Buscar cédula o nombre..."
+                    oninput="matFiltrar()"
+                    style="width:100%;font-size:11px;padding:4px 8px;border:1.5px solid #c8d8e8;border-radius:5px;outline:none">
+                </td>
+                <td style="padding:4px 6px">
+                  <input id="mf-cargo" type="text" placeholder="Cargo..."
+                    oninput="matFiltrar()"
+                    style="width:100%;font-size:10px;padding:4px 7px;border:1.5px solid #c8d8e8;border-radius:5px;outline:none">
+                </td>
+                <td style="padding:4px 6px">
+                  <select id="mf-gv" onchange="matFiltrar()"
+                    style="width:100%;font-size:10px;padding:4px 6px;border:1.5px solid #c8d8e8;border-radius:5px;outline:none">
+                    <option value="">Todos</option>
+                    <option>NO</option>
+                    <option>Embarazada</option>
+                    <option>Persona con Discapacidad</option>
+                    <option>Enfermedad Catastrófica</option>
+                    <option>Adulto Mayor (>65)</option>
+                  </select>
+                </td>
+                <td style="padding:4px 6px">
+                  <input id="mf-fecha" type="month" onchange="matFiltrar()"
+                    style="width:100%;font-size:10px;padding:3px 6px;border:1.5px solid #c8d8e8;border-radius:5px;outline:none">
+                </td>
+                <td style="padding:4px 6px">
+                  <select id="mf-tipo" onchange="matFiltrar()"
+                    style="width:100%;font-size:10px;padding:4px 6px;border:1.5px solid #c8d8e8;border-radius:5px;outline:none">
+                    <option value="">Todos</option>
+                    <option>Ingreso</option>
+                    <option>Periódico</option>
+                    <option>Reintegro</option>
+                    <option>Egreso/Retiro</option>
+                  </select>
+                </td>
+                <td style="padding:4px 6px">
+                  <select id="mf-aptitud" onchange="matFiltrar()"
+                    style="width:100%;font-size:10px;padding:4px 6px;border:1.5px solid #c8d8e8;border-radius:5px;outline:none">
+                    <option value="">Todos</option>
+                    <option>APTO</option>
+                    <option>APTO EN OBSERVACIÓN</option>
+                    <option>APTO CON LIMITACIONES</option>
+                    <option>NO APTO</option>
+                  </select>
+                </td>
+                <td style="padding:4px 6px"><!-- Diagnósticos --></td>
+                <td style="padding:4px 6px">
+                  <input id="mf-ciudad" type="text" placeholder="Ciudad..."
+                    oninput="matFiltrar()"
+                    style="width:100%;font-size:10px;padding:4px 7px;border:1.5px solid #c8d8e8;border-radius:5px;outline:none">
+                </td>
+                <td style="padding:4px 6px"><!-- Dashboard --></td>
+                <td style="padding:4px 5px;text-align:center">
+                  <button onclick="matLimpiarFiltros()" title="Limpiar filtros"
+                    style="background:#e74c3c;color:#fff;border:none;border-radius:4px;padding:3px 7px;cursor:pointer;font-size:10px;font-weight:700">✕</button>
+                </td>
+              </tr>
+            </thead>
+            <tbody id="mat-tbody">
+              <tr><td colspan="14" style="text-align:center;padding:40px;color:#bbb">
+                <div style="font-size:32px;margin-bottom:8px">📋</div>
+                <div style="font-size:12px;font-weight:600;color:#888">La matriz está vacía</div>
+                <div style="font-size:11px;color:#aaa;margin-top:4px">Usa ➕ Nueva fila para ingresar datos manualmente</div>
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div id="mat-footer" style="padding:7px 14px;background:#f8fafd;border-top:1px solid #e8eef8;font-size:10px;color:#9aabbc;display:flex;justify-content:space-between">
+          <span id="mat-empresa-footer">CASISO S.A.S. — Dr. Martín Lino Zambrano</span>
+          <span id="mat-time"></span>
+        </div>
+      </div>
+
+    </div><!-- /dtab-matriz -->
+
+    <!-- ═══ TAB: INGRESO ═══ -->
+    <div id="dtab-ingreso" style="display:none;padding:14px">
+      <div style="background:#e8f8ef;border-radius:8px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span style="font-size:12px;font-weight:700;color:#15692a">🟢 Matriz — Evaluaciones de INGRESO</span>
+        <span id="count-ingreso" style="font-size:11px;color:#15692a;font-weight:700;background:#fff;padding:3px 10px;border-radius:10px">0 registros</span>
+        <button onclick="showDashboardTipo('ingreso')" style="background:#15692a;color:#fff;border:none;border-radius:5px;padding:6px 13px;cursor:pointer;font-size:11px;font-weight:700;margin-left:auto">📈 Dashboard Ingreso</button>
+      </div>
+      <div style="background:#fff;border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.08);overflow:hidden">
+        <div style="overflow-x:auto;overflow-y:auto;max-height:70vh">
+          <table id="tabla-ingreso" style="width:100%;border-collapse:collapse;font-size:11px;min-width:900px">
+            <thead id="thead-tipo"></thead><tbody id="tbody-ingreso"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ TAB: PERIÓDICO ═══ -->
+    <div id="dtab-periodico" style="display:none;padding:14px">
+      <div style="background:#e8f0fb;border-radius:8px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span style="font-size:12px;font-weight:700;color:#1556a0">🔵 Matriz — Evaluaciones PERIÓDICAS</span>
+        <span id="count-periodico" style="font-size:11px;color:#1556a0;font-weight:700;background:#fff;padding:3px 10px;border-radius:10px">0 registros</span>
+        <button onclick="showDashboardTipo('periodico')" style="background:#1556a0;color:#fff;border:none;border-radius:5px;padding:6px 13px;cursor:pointer;font-size:11px;font-weight:700;margin-left:auto">📈 Dashboard Periódico</button>
+      </div>
+      <div style="background:#fff;border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.08);overflow:hidden">
+        <div style="overflow-x:auto;overflow-y:auto;max-height:70vh">
+          <table id="tabla-periodico" style="width:100%;border-collapse:collapse;font-size:11px;min-width:900px">
+            <thead></thead><tbody id="tbody-periodico"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ TAB: REINTEGRO ═══ -->
+    <div id="dtab-reintegro" style="display:none;padding:14px">
+      <div style="background:#fff8e1;border-radius:8px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span style="font-size:12px;font-weight:700;color:#856404">🟡 Matriz — Evaluaciones de REINTEGRO</span>
+        <span id="count-reintegro" style="font-size:11px;color:#856404;font-weight:700;background:#fff;padding:3px 10px;border-radius:10px">0 registros</span>
+        <button onclick="showDashboardTipo('reintegro')" style="background:#856404;color:#fff;border:none;border-radius:5px;padding:6px 13px;cursor:pointer;font-size:11px;font-weight:700;margin-left:auto">📈 Dashboard Reintegro</button>
+      </div>
+      <div style="background:#fff;border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.08);overflow:hidden">
+        <div style="overflow-x:auto;overflow-y:auto;max-height:70vh">
+          <table id="tabla-reintegro" style="width:100%;border-collapse:collapse;font-size:11px;min-width:900px">
+            <thead></thead><tbody id="tbody-reintegro"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ TAB: EGRESO ═══ -->
+    <div id="dtab-egreso" style="display:none;padding:14px">
+      <div style="background:#fdecea;border-radius:8px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span style="font-size:12px;font-weight:700;color:#8b1a1a">🔴 Matriz — Evaluaciones de EGRESO / RETIRO</span>
+        <span id="count-egreso" style="font-size:11px;color:#8b1a1a;font-weight:700;background:#fff;padding:3px 10px;border-radius:10px">0 registros</span>
+        <button onclick="showDashboardTipo('egreso')" style="background:#8b1a1a;color:#fff;border:none;border-radius:5px;padding:6px 13px;cursor:pointer;font-size:11px;font-weight:700;margin-left:auto">📈 Dashboard Egreso</button>
+      </div>
+      <div style="background:#fff;border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.08);overflow:hidden">
+        <div style="overflow-x:auto;overflow-y:auto;max-height:70vh">
+          <table id="tabla-egreso" style="width:100%;border-collapse:collapse;font-size:11px;min-width:900px">
+            <thead></thead><tbody id="tbody-egreso"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ TAB: DASHBOARD ═══════════════ -->
+    <div id="dtab-dashboard" style="display:none;padding:14px">
+
+      <!-- Selector de fuente de datos para el dashboard -->
+      <div style="background:#fff;border-radius:10px;padding:12px 16px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.07)">
+        <div style="font-size:11px;font-weight:700;color:#5a7a9a;margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">📊 Generar dashboard desde:</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button onclick="elegirFuenteDashboard('todos')" id="dash-src-todos"
+            style="padding:7px 14px;border-radius:6px;border:2px solid #1556a0;background:#1556a0;color:#fff;cursor:pointer;font-size:11px;font-weight:700">
+            📋 Todos los tipos
+          </button>
+          <button onclick="elegirFuenteDashboard('ingreso')" id="dash-src-ingreso"
+            style="padding:7px 14px;border-radius:6px;border:2px solid #27ae60;background:#fff;color:#27ae60;cursor:pointer;font-size:11px;font-weight:700">
+            🟢 Solo Ingreso
+          </button>
+          <button onclick="elegirFuenteDashboard('periodico')" id="dash-src-periodico"
+            style="padding:7px 14px;border-radius:6px;border:2px solid #1556a0;background:#fff;color:#1556a0;cursor:pointer;font-size:11px;font-weight:700">
+            🔵 Solo Periódico
+          </button>
+          <button onclick="elegirFuenteDashboard('reintegro')" id="dash-src-reintegro"
+            style="padding:7px 14px;border-radius:6px;border:2px solid #856404;background:#fff;color:#856404;cursor:pointer;font-size:11px;font-weight:700">
+            🟡 Solo Reintegro
+          </button>
+          <button onclick="elegirFuenteDashboard('egreso')" id="dash-src-egreso"
+            style="padding:7px 14px;border-radius:6px;border:2px solid #e74c3c;background:#fff;color:#e74c3c;cursor:pointer;font-size:11px;font-weight:700">
+            🔴 Solo Egreso/Retiro
+          </button>
+        </div>
+        <div id="dash-fuente-label" style="margin-top:6px;font-size:10px;color:#9aabbc">
+          Mostrando estadísticas de: <strong>Todos los tipos</strong>
+        </div>
+      </div>
+
+      <!-- KPIs -->
+      <div id="dash-kpis" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;margin-bottom:12px"></div>
+
+      <!-- Progreso -->
+      <div style="background:#fff;border-radius:8px;padding:12px 16px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.07)">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:#5a7a9a;margin-bottom:4px">
+          <span style="font-weight:700;color:#1556a0;font-size:12px">Avance</span>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="font-size:10px;color:#9aabbc">Meta:</span>
+            <input type="number" id="inp-planificadas" value="25" min="1"
+              style="width:55px;text-align:center;font-size:12px;font-weight:700;padding:3px 5px;border:1.5px solid #d0dcea;border-radius:4px;color:#1556a0"
+              oninput="actualizarProgreso()">
+          </div>
+          <span id="prog-texto" style="font-weight:600"></span>
+        </div>
+        <div style="background:#e8eef8;border-radius:6px;height:10px;overflow:hidden">
+          <div id="prog-barra" style="height:100%;width:0%;background:linear-gradient(90deg,#1e7a3a,#27ae60);border-radius:6px;transition:width .5s"></div>
+        </div>
+      </div>
+
+      <!-- Fila 1 -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+        <div class="dash-card">
+          <div class="dash-card-title">⚧ Género / Sexo</div>
+          <div id="leg-gen" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px"></div>
+          <div style="position:relative;height:160px"><canvas id="ch-genero"></canvas></div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-card-title">📅 Grupos de edad</div>
+          <div style="position:relative;height:180px"><canvas id="ch-edad"></canvas></div>
+        </div>
+      </div>
+      <!-- Fila 2 -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+        <div class="dash-card">
+          <div class="dash-card-title">✅ Aptitud médica laboral</div>
+          <div id="leg-apt" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px"></div>
+          <div style="position:relative;height:160px"><canvas id="ch-aptitud"></canvas></div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-card-title">⚖️ IMC</div>
+          <div style="position:relative;height:180px"><canvas id="ch-imc"></canvas></div>
+        </div>
+      </div>
+      <div class="dash-card" style="margin-bottom:12px">
+        <div class="dash-card-title">💼 Cargos</div>
+        <div style="position:relative;height:220px" id="box-cargos"><canvas id="ch-cargos"></canvas></div>
+      </div>
+      <div class="dash-card" style="margin-bottom:12px">
+        <div class="dash-card-title">🔬 Diagnósticos más frecuentes</div>
+        <div style="position:relative;height:260px" id="box-dx"><canvas id="ch-dx"></canvas></div>
+      </div>
+      <div class="dash-card" style="margin-bottom:12px">
+        <div class="dash-card-title">🏥 Sistemas orgánicos afectados</div>
+        <div style="position:relative;height:200px" id="box-sis"><canvas id="ch-sistemas"></canvas></div>
+      </div>
+      <div class="dash-card" style="margin-bottom:12px">
+        <div class="dash-card-title">💊 ECNT detectadas</div>
+        <div style="position:relative;height:190px"><canvas id="ch-ecnt"></canvas></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+        <div class="dash-card">
+          <div class="dash-card-title">🚨 Grupos prioritarios</div>
+          <div style="position:relative;height:180px"><canvas id="ch-gp"></canvas></div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-card-title">🩸 Grupos sanguíneos</div>
+          <div style="position:relative;height:180px"><canvas id="ch-gs"></canvas></div>
+        </div>
+      </div>
+
+    </div><!-- /dtab-dashboard -->
+
+    <!-- ═══════════════ TAB: ECNT CONFIG ═══════════════ -->
+    <div id="dtab-config" style="display:none;padding:14px">
+      <div style="max-width:680px;margin:0 auto">
+        <div style="background:#fff;border-radius:10px;padding:18px;box-shadow:0 1px 6px rgba(0,0,0,.08);margin-bottom:10px">
+          <h3 style="color:#1556a0;font-size:13px;margin:0 0 10px">⚙️ Códigos CIE-10 clasificados como ECNT</h3>
+          <div style="display:grid;grid-template-columns:120px 1fr auto;gap:7px;margin-bottom:12px;align-items:end">
+            <div>
+              <label style="font-size:10px;font-weight:700;color:#5a7a9a;display:block;margin-bottom:3px">CIE-10</label>
+              <input id="new-cie" type="text" placeholder="ej. J45" maxlength="10"
+                style="font-size:12px;padding:6px 9px;border:1.5px solid #c8d8e8;border-radius:5px;width:100%;text-transform:uppercase"
+                oninput="this.value=this.value.toUpperCase()">
+            </div>
+            <div>
+              <label style="font-size:10px;font-weight:700;color:#5a7a9a;display:block;margin-bottom:3px">NOMBRE ECNT</label>
+              <input id="new-ecnt-nombre" type="text" placeholder="ej. Asma, Enfermedad renal crónica"
+                style="font-size:12px;padding:6px 9px;border:1.5px solid #c8d8e8;border-radius:5px;width:100%">
+            </div>
+            <button onclick="agregarECNT()" style="background:#1556a0;color:#fff;border:none;border-radius:5px;padding:7px 13px;cursor:pointer;font-size:11px;font-weight:700;height:32px">➕</button>
+          </div>
+          <div id="tabla-ecnt"></div>
+          <button onclick="resetECNT()" style="margin-top:10px;background:#fff;color:#e74c3c;border:1.5px solid #e8b4b4;border-radius:5px;padding:6px 12px;cursor:pointer;font-size:11px;font-weight:700">↺ Restaurar defecto</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal edición -->
+    <div class="d-modal-bg" id="modal-edit">
+      <div class="d-modal">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;border-bottom:2px solid #e8eef8;padding-bottom:10px">
+          <h3 style="color:#1556a0;font-size:14px;margin:0">✏️ Editar registro</h3>
+          <button onclick="cerrarModal()" style="background:#e8eef8;border:none;border-radius:5px;padding:4px 12px;cursor:pointer;font-size:13px">✕</button>
+        </div>
+        <div id="modal-form"></div>
+        <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end;border-top:1px solid #e8eef8;padding-top:10px">
+          <button onclick="cerrarModal()" style="background:#e8eef8;border:none;border-radius:5px;padding:7px 16px;cursor:pointer;font-size:12px;font-weight:600">Cancelar</button>
+          <button onclick="guardarEdicion()" style="background:#1556a0;color:#fff;border:none;border-radius:5px;padding:7px 18px;cursor:pointer;font-size:12px;font-weight:700">💾 Guardar</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /dashboard-panel -->
+
+  <div id="form-content"></div>
+</div>
+
+<script>
+const STEPS=["Datos Generales","Antecedentes","Examen Clínico","Riesgos Laborales","Exámenes y Dx","Aptitud y Cierre"];
+let currentStep=0;
+let matrizCount=0;
+
+const RIESGOS={
+  "FÍSICO":["Temperaturas altas","Temperaturas bajas","Radiación Ionizante","Radiación No Ionizante","Ruido","Vibración","Iluminación","Ventilación","Fluido eléctrico"],
+  "SEG. LOCATIVOS":["Falta de señalización, aseo, desorden"],
+  "SEG. MECÁNICOS":["Atrapamiento entre Máquinas","Atrapamiento entre objetos","Caída de objetos","Caídas al mismo nivel","Caídas a diferente nivel","Pinchazos","Cortes","Choques/colisión vehicular","Atropellamientos","Proyección de fluidos","Proyección de partículas","Contacto superficies trabajo"],
+  "SEG. ELÉCTRICOS":["Contacto eléctrico"],
+  "QUÍMICO":["Polvos","Sólidos","Humos","Líquidos","Vapores","Aerosoles","Neblinas","Gaseosos"],
+  "BIOLÓGICO":["Virus","Hongos","Bacterias","Parásitos","Exp. vectores","Exp. animales selváticos"],
+  "ERGONÓMICO":["Manejo manual de cargas","Movimientos repetitivos","Posturas forzadas","Trabajos con PVD","Diseño inadecuado del puesto"],
+  "PSICOSOCIAL":["Monotonía del trabajo","Sobrecarga laboral","Minuciosidad de la tarea","Alta responsabilidad","Autonomía en decisiones","Supervisión deficiente","Conflicto de rol","Falta de claridad funciones","Distribución del trabajo","Turnos rotativos","Relaciones interpersonales","Inestabilidad laboral","Amenaza delincuencial"]
+};
+
+const EF_SECCIONES=[
+  {num:1,nombre:"Piel",        items:["Cicatrices","Piel y Faneras"]},
+  {num:2,nombre:"Ojos",        items:["Párpados","Conjuntivas","Pupilas","Córnea","Motilidad"]},
+  {num:3,nombre:"Oído",        items:["C. auditivo externo","Pabellón","Tímpanos"]},
+  {num:4,nombre:"Orofaringe",  items:["Labios","Lengua","Faringe","Amígdalas","Dentadura"]},
+  {num:5,nombre:"Nariz",       items:["Tabique","Cornetes","Mucosas","Senos paranasales"]},
+  {num:6,nombre:"Cuello",      items:["Tiroides / masas","Movilidad"]},
+  {num:7,nombre:"Tórax",       items:["Mamas","Corazón"]},
+  {num:8,nombre:"Tórax/Pulm.", items:["Pulmones","Corazón","Parrilla costal"]},
+  {num:9,nombre:"Abdomen",     items:["Vísceras","Pared abdominal"]},
+  {num:10,nombre:"Columna",    items:["Flexibilidad","Desviación","Dolor"]},
+  {num:11,nombre:"Pelvis",     items:["Pelvis","Genitales"]},
+  {num:12,nombre:"Extremidades",items:["Vascular","Miembros superiores","Miembros inferiores"]},
+  {num:13,nombre:"Neurológico",items:["Fuerza","Sensibilidad","Marcha","Reflejos osteotendinosos"]},
+];
+function initEFItems(){const r={};EF_SECCIONES.forEach(s=>s.items.forEach((it,ii)=>{r[`${s.num}|${ii}`]={checked:false,desc:""};}));return r;}
+function initRiesgos(){const r={};Object.values(RIESGOS).flat().forEach(n=>{r[n]=[false,false,false,false,false,false,false];});return r;}
+
+let form = {
+  institucion:"",ruc:"",ciiu:"",establecimiento:"",nroHistoria:"",nroArchivo:"",
+  primerApellido:"",segundoApellido:"",primerNombre:"",segundoNombre:"",cedula:"",
+  embarazada:false,discapacidad:false,enfCatastrofica:false,adultoMayor:false,
+  sexo:"",fechaNacimiento:"",edad:"",grupoSanguineo:"",lateralidad:"",
+  puestoCIUO:"",fechaAtencion:"",fechaIngreso:"",fechaReintegro:"",fechaUltimoDia:"",
+  tipoEvaluacion:"",motivoObs:"",
+  antClinico:"",antFamiliares:"",condEspecial:"",
+  autTransfusion:"",ttoHormonal:"",ttoHormonalCual:"",
+  fum:"",gestas:"",partos:"",cesareas:"",abortos:"",metPlanFem:"",
+  examRepMasc:"",tiempoRepMasc:"",metPlanMasc:"",
+  tabacoT:"",tabacoEx:false,tabacoAbs:"",tabacoNo:false,
+  alcoholT:"",alcoholEx:false,alcoholAbs:"",alcoholNo:false,
+  otraSustancia:"",otraSustanciaT:"",otraSustanciaEx:false,otraSustanciaAbs:"",otraSustanciaNo:false,
+  actFisicaSi:"",actFisicaCual:"",actFisicaT:"",
+  medicHabitual:false,medicHabitualCual:"",medicHabitualCantidad:"",
+  ginecoNoAplica:false,
+  enfermedadActual:"",
+  temperatura:"",pa:"",fc:"",fr:"",spo2:"",peso:"",talla:"",imc:"",perAbdominal:"",
+  examenFisicoObs:"",
+  examenFisicoItems:initEFItems(),
+  examenFisicoRegiones:{
+    "1. Piel":{checked:false,hallazgo:""},
+    "2. Ojos":{checked:false,hallazgo:""},
+    "3. Oído":{checked:false,hallazgo:""},
+    "4. Orofaringe":{checked:false,hallazgo:""},
+    "5. Nariz":{checked:false,hallazgo:""},
+    "6. Cuello":{checked:false,hallazgo:""},
+    "7. Tórax/Mamas":{checked:false,hallazgo:""},
+    "8. Tórax/Pulmones-Corazón":{checked:false,hallazgo:""},
+    "9. Abdomen":{checked:false,hallazgo:""},
+    "10. Columna":{checked:false,hallazgo:""},
+    "11. Pelvis/Genitales":{checked:false,hallazgo:""},
+    "12. Extremidades/Vascular":{checked:false,hallazgo:""},
+    "13. Neurológico":{checked:false,hallazgo:""}
+  },
+  puestoRiesgo:"",actividades:["","","","","","",""],
+  riesgos:initRiesgos(),
+  medidasPreventivas:"",
+  antLaborales:[{centro:"",actividades:"",anterior:false,actual:false,tiempo:"",incidente:false,accidente:false,ep:false,iesssi:false,iessno:false,fecha:"",especificar:""}],
+  actExtraLaborales:"",
+  examenes:[{nombre:"",fecha:"",resultado:""}],
+  examenesObs:"",
+  diagnosticos:[{cie10:"",desc:"",tipo:""},{cie10:"",desc:"",tipo:""},{cie10:"",desc:"",tipo:""},{cie10:"",desc:"",tipo:""},{cie10:"",desc:"",tipo:""},{cie10:"",desc:"",tipo:""}],
+  aptitud:"",aptitudObs:"",
+  recomendaciones:"",
+  retiroEval:"",retiroRelacionado:"",retiroObs:"",
+  nombreProf:"Dr. Martín Lino Zambrano",codigoMedico:""
+};
+
+function calcIMC(){
+  const p=parseFloat(form.peso),t=parseFloat(form.talla);
+  if(p>0&&t>0){const tm=t>3?t/100:t;form.imc=(p/(tm*tm)).toFixed(1);}else form.imc="";
+  const el=document.getElementById('f-imc');if(el)el.value=form.imc||"";
+  const b=document.getElementById('imc-badge');
+  if(b&&form.imc){
+    const v=parseFloat(form.imc);
+    const [txt,bg,co]=v<18.5?["Bajo peso","#fff8e8","#7a4a00"]:v<25?["✓ Normal","#eaf6ee","#1e5530"]:v<30?["Sobrepeso","#fff3ec","#7a3000"]:v<35?["Obesidad I","#fceaea","#701010"]:["Obesidad II+","#7a0000","#fff"];
+    b.style.cssText=`background:${bg};color:${co};display:inline-block`;
+    b.textContent=`IMC ${form.imc} kg/m² — ${txt}`;
+  }else if(b)b.style.display='none';
+}
+function calcEdad(){
+  if(form.fechaNacimiento){
+    const bd=new Date(form.fechaNacimiento),hoy=new Date();
+    let edad=hoy.getFullYear()-bd.getFullYear();
+    if(hoy.getMonth()<bd.getMonth()||(hoy.getMonth()===bd.getMonth()&&hoy.getDate()<bd.getDate()))edad--;
+    form.edad=String(edad);
+    const el=document.getElementById('f-edad');if(el)el.value=form.edad;
+  }
+}
+function f(k,v){form[k]=v;if(k==='peso'||k==='talla')calcIMC();if(k==='fechaNacimiento')calcEdad();}
+function setAct(i,v){form.actividades[i]=v;}
+function setRiesgo(n,i,v){if(form.riesgos[n])form.riesgos[n][i]=v;}
+function setAntLab(i,k,v){form.antLaborales[i][k]=v;}
+function addAntLab(){form.antLaborales.push({centro:"",actividades:"",anterior:false,actual:false,tiempo:"",incidente:false,accidente:false,ep:false,iesssi:false,iessno:false,fecha:"",especificar:""});render();}
+function removeAntLab(i){form.antLaborales.splice(i,1);render();}
+function setExam(i,k,v){form.examenes[i][k]=v;}
+function addExam(){form.examenes.push({nombre:"",fecha:"",resultado:""});render();}
+function removeExam(i){if(form.examenes.length>1){form.examenes.splice(i,1);render();}}
+function setDx(i,k,v){form.diagnosticos[i][k]=v;}
+function setRegion(region,key,value){
+  if(form.examenFisicoRegiones[region]){
+    form.examenFisicoRegiones[region][key]=value;
+    if(key==='checked') render();
+  }
+}
+function setEFItem(key,field,value){
+  if(!form.examenFisicoItems[key])form.examenFisicoItems[key]={checked:false,desc:""};
+  form.examenFisicoItems[key][field]=value;
+  if(field==='checked')render();
+}
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function inp(lbl,k,type='text',extra='',xid=''){
+  return `<div class="fld"><label>${lbl}</label><input type="${type}" value="${esc(form[k]||'')}" data-key="${k}" ${xid?`id="${xid}"`:''}${extra?` ${extra}`:''} oninput="f('${k}',this.value)"></div>`;
+}
+function slct(lbl,k,opts){
+  const v=form[k]||'';
+  const o=`<option value="">— Selec. —</option>`+opts.map(op=>typeof op==='object'?`<option value="${op.v}"${v===op.v?' selected':''}>${op.l}</option>`:`<option value="${op}"${v===op?' selected':''}>${op}</option>`).join('');
+  return `<div class="fld"><label>${lbl}</label><select onchange="f('${k}',this.value)">${o}</select></div>`;
+}
+function ta(lbl,k,rows=3){return `<div class="fld"><label>${lbl}</label><textarea rows="${rows}" oninput="f('${k}',this.value)">${esc(form[k]||'')}</textarea></div>`;}
+function chkEl(lbl,k){return `<label class="chi"><input type="checkbox" ${form[k]?'checked':''} onchange="f('${k}',this.checked)">${lbl}</label>`;}
+function rad(name,val,lbl,k){return `<label class="chi"><input type="radio" name="${name}" value="${val}" ${form[k]===val?'checked':''} onchange="f('${k}',this.value)">${lbl}</label>`;}
+
+// ─── STEPS ───
+function gotoStep(n){currentStep=n;render();}
+function renderSteps(){
+  document.getElementById('steps-bar').innerHTML=STEPS.map((s,i)=>
+    `<button class="step-btn${i===currentStep?' active':''}" onclick="gotoStep(${i})"><span class="sn">${i+1}</span>${s}</button>`).join('');
+}
+
+function step0(){return `
+<div class="card"><div class="sec">A. Datos del Establecimiento</div><div class="sb">
+  <div class="g3" style="margin-bottom:8px">${inp('Institución del Sistema','institucion')}<div class="g2">${inp('RUC','ruc')}${inp('CIIU','ciiu')}</div></div>
+  <div class="g3">${inp('Establecimiento / Centro de Trabajo','establecimiento')}${inp('N° Historia Clínica','nroHistoria')}${inp('N° Archivo','nroArchivo')}</div>
+</div></div>
+<div class="card"><div class="sec sub">A. Datos del Usuario</div><div class="sb">
+  <div class="g4" style="margin-bottom:8px">
+    ${inp('Primer Apellido','primerApellido')}${inp('Segundo Apellido','segundoApellido')}
+    ${inp('Primer Nombre','primerNombre')}${inp('Segundo Nombre','segundoNombre')}
+  </div>
+  <div style="margin-bottom:8px">${inp('Cédula de Ciudadanía','cedula')}</div>
+  <div class="g2">
+    <div><div class="sub-lbl">Grupo de Atención Prioritaria</div>
+      <div class="chk-g">${chkEl('Embarazada','embarazada')}${chkEl('Discapacidad','discapacidad')}${chkEl('Enf. Catastrófica','enfCatastrofica')}${chkEl('Adulto Mayor','adultoMayor')}</div>
+    </div>
+    <div class="g3">
+      ${slct('Sexo','sexo',['Hombre','Mujer'])}
+      ${inp('Fecha Nacimiento','fechaNacimiento','date')}
+      ${inp('Edad (auto)','edad','text','readonly','f-edad')}
+      ${slct('Grupo Sanguíneo','grupoSanguineo',['A+','A-','B+','B-','AB+','AB-','O+','O-'])}
+      ${slct('Lateralidad','lateralidad',['Diestro','Zurdo','Ambidiestro'])}
+    </div>
+  </div>
+</div></div>
+<div class="card"><div class="sec teal">B. Motivo de Consulta</div><div class="sb">
+  <div style="margin-bottom:8px">${inp('Puesto de Trabajo (CIUO)','puestoCIUO')}</div>
+  <div class="g4" style="margin-bottom:8px">
+    ${inp('Fecha de Atención','fechaAtencion','date')}${inp('Fecha de Ingreso','fechaIngreso','date')}
+    ${inp('Fecha de Reintegro','fechaReintegro','date')}${inp('Fecha Último Día Laboral','fechaUltimoDia','date')}
+  </div>
+  <div class="sub-lbl">Tipo de Evaluación</div>
+  <div class="chk-g">
+    ${rad('tipo','INGRESO','INGRESO','tipoEvaluacion')}${rad('tipo','PERIÓDICO','PERIÓDICO','tipoEvaluacion')}
+    ${rad('tipo','REINTEGRO','REINTEGRO','tipoEvaluacion')}${rad('tipo','RETIRO','RETIRO','tipoEvaluacion')}
+  </div>
+  <div style="margin-top:8px">${ta('Observación','motivoObs',2)}</div>
+</div></div>`;}
+
+function step1(){return `
+<div class="card"><div class="sec">C. Antecedentes Personales</div><div class="sb">
+  ${ta('Antecedentes Clínicos y Quirúrgicos','antClinico',3)}
+  <div style="margin-top:8px">${ta('Antecedentes Familiares','antFamiliares',2)}</div>
+  <div style="margin-top:8px">${ta('Condición especial (urgencia/emergencia/tratamiento)','condEspecial',2)}</div>
+  <div class="g3" style="margin-top:8px">
+    ${slct('Autoriza Transfusiones','autTransfusion',['SI','NO'])}
+    ${slct('Tratamiento Hormonal','ttoHormonal',['SI','NO'])}
+    ${inp('¿Cuál tratamiento?','ttoHormonalCual')}
+  </div>
+</div></div>
+<div class="card"><div class="sec pink">Antecedentes Gineco Obstétricos</div><div class="sb">
+  <div style="margin-bottom:8px">${chkEl('No Aplica (paciente masculino o no corresponde)','ginecoNoAplica')}</div>
+  ${!form.ginecoNoAplica?`<div class="g4">
+    ${inp('FUM (Última Menstruación)','fum','date')}${inp('Gestas','gestas','number')}
+    ${inp('Partos','partos','number')}${inp('Cesáreas','cesareas','number')}
+    ${inp('Abortos','abortos','number')}${inp('Método Planificación Familiar','metPlanFem')}
+  </div>`:'<div style="color:#888;font-size:11px;padding:4px 0">Sección no aplica — marcado en el Excel.</div>'}
+</div></div>
+<div class="card"><div class="sec sub">Antecedentes Reproductivos Masculinos</div><div class="sb">
+  <div class="g3">
+    ${inp('Exámenes Realizados ¿Cuál?','examRepMasc')}${inp('Tiempo (años)','tiempoRepMasc','number')}${inp('Método Planificación Familiar','metPlanMasc')}
+  </div>
+</div></div>
+<div class="card"><div class="sec gray">Consumo de Sustancias / Estilo de Vida</div><div class="sb">
+  <table class="tbl" style="margin-bottom:10px">
+    <thead><tr><th>Sustancia</th><th>Tiempo</th><th>Ex Consumidor</th><th>T. Abstinencia (m)</th><th>No Consume</th></tr></thead>
+    <tbody>
+      <tr><td><b>TABACO</b></td><td><input oninput="f('tabacoT',this.value)" value="${esc(form.tabacoT)}"></td><td style="text-align:center"><input type="checkbox" ${form.tabacoEx?'checked':''} onchange="f('tabacoEx',this.checked)" style="accent-color:#1556a0"></td><td><input oninput="f('tabacoAbs',this.value)" value="${esc(form.tabacoAbs)}"></td><td style="text-align:center"><input type="checkbox" ${form.tabacoNo?'checked':''} onchange="f('tabacoNo',this.checked)" style="accent-color:#1556a0"></td></tr>
+      <tr><td><b>ALCOHOL</b></td><td><input oninput="f('alcoholT',this.value)" value="${esc(form.alcoholT)}"></td><td style="text-align:center"><input type="checkbox" ${form.alcoholEx?'checked':''} onchange="f('alcoholEx',this.checked)" style="accent-color:#1556a0"></td><td><input oninput="f('alcoholAbs',this.value)" value="${esc(form.alcoholAbs)}"></td><td style="text-align:center"><input type="checkbox" ${form.alcoholNo?'checked':''} onchange="f('alcoholNo',this.checked)" style="accent-color:#1556a0"></td></tr>
+      <tr><td><input placeholder="Otras..." oninput="f('otraSustancia',this.value)" value="${esc(form.otraSustancia)}"></td><td><input oninput="f('otraSustanciaT',this.value)" value="${esc(form.otraSustanciaT)}"></td><td style="text-align:center"><input type="checkbox" ${form.otraSustanciaEx?'checked':''} onchange="f('otraSustanciaEx',this.checked)" style="accent-color:#1556a0"></td><td><input oninput="f('otraSustanciaAbs',this.value)" value="${esc(form.otraSustanciaAbs||'')}"></td><td style="text-align:center"><input type="checkbox" ${form.otraSustanciaNo?'checked':''} onchange="f('otraSustanciaNo',this.checked)" style="accent-color:#1556a0"></td></tr>
+    </tbody>
+  </table>
+  <div class="g2">
+    <div>
+      <div class="sub-lbl" style="margin-bottom:5px">Actividad Física</div>
+      <div class="g3">
+        ${inp('¿Cuál? (tipo de actividad)','actFisicaCual')}
+        ${inp('Tiempo / Frecuencia','actFisicaT')}
+        <div class="fld"><label>¿Realiza actividad?</label>
+          <select onchange="f('actFisicaSi',this.value)" style="border:1.5px solid #c8d8e8;border-radius:4px;padding:5px 8px;font-size:12px;width:100%">
+            <option value="" ${!form.actFisicaSi?'selected':''}>— Seleccionar —</option>
+            <option value="SI" ${form.actFisicaSi==='SI'?'selected':''}>Sí</option>
+            <option value="NO" ${form.actFisicaSi==='NO'?'selected':''}>No</option>
+            <option value="NO APLICA" ${form.actFisicaSi==='NO APLICA'?'selected':''}>No aplica</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div>${chkEl('Medicación Habitual','medicHabitual')}${form.medicHabitual?`<div class="g2" style="margin-top:7px">${inp('¿Cuál medicación?','medicHabitualCual')}${inp('Cantidad / Dosis','medicHabitualCantidad')}</div>`:''}</div>
+  </div>
+</div></div>`;}
+
+function step2(){return `
+<div class="card"><div class="sec">D. Enfermedad o Problema Actual</div><div class="sb">${ta('Descripción','enfermedadActual',4)}</div></div>
+<div class="card"><div class="sec sub">E. Constantes Vitales y Antropometría</div><div class="sb">
+  <div class="g4" style="margin-bottom:7px">
+    ${inp('Temperatura (°C)','temperatura','number')}${inp('Presión Arterial (mmHg)','pa')}
+    ${inp('FC (lat/min)','fc','number')}${inp('FR (fr/min)','fr','number')}
+    ${inp('SpO2 (%)','spo2','number')}${inp('Peso (Kg)','peso','number')}
+    ${inp('Talla (cm)','talla','number')}
+    <div class="fld"><label>IMC (kg/m²) — automático</label><input id="f-imc" readonly value="${esc(form.imc||'')}"></div>
+    ${inp('Perímetro Abdominal (cm)','perAbdominal','number')}
+  </div>
+  <span class="imc-badge" id="imc-badge" style="display:${form.imc?'inline-block':'none'}">${form.imc?`IMC ${form.imc}`:''}</span>
+</div></div>
+<div class="card"><div class="sec teal">F. Examen Físico Regional</div><div class="sb">
+  <div class="note">Marque <b>X</b> en los ítems con hallazgo y describa. Sin marcado = <b>NORMAL</b>.</div>
+  <div style="overflow-x:auto">
+  <table style="width:100%;border-collapse:collapse;font-size:10px;table-layout:fixed">
+    <colgroup>
+      <col style="width:13%"><col style="width:13%">
+      <col style="width:13%"><col style="width:13%">
+      <col style="width:12%"><col style="width:12%">
+      <col style="width:12%"><col style="width:12%">
+    </colgroup>
+    <tbody>
+    ${(()=>{
+      // Distribute 13 sections across rows, 4 columns each, matching Excel layout
+      // Each cell = one section with its sub-items
+      const cols=4;
+      const rows=Math.ceil(EF_SECCIONES.length/cols);
+      let html='';
+      for(let row=0;row<rows;row++){
+        html+='<tr>';
+        for(let col=0;col<cols;col++){
+          const si=row*cols+col;
+          if(si>=EF_SECCIONES.length){html+='<td colspan="2" style="border:1px solid #c8d8e8;background:#f8fafd"></td>';continue;}
+          const sec=EF_SECCIONES[si];
+          html+=`<td colspan="2" style="border:1px solid #1556a0;vertical-align:top;padding:0">
+            <div style="background:#1556a0;color:#fff;font-size:9px;font-weight:700;padding:3px 6px;display:flex;align-items:center;gap:4px">
+              <span style="background:rgba(255,255,255,.2);border-radius:50%;width:14px;height:14px;display:inline-flex;align-items:center;justify-content:center;font-size:8px;flex-shrink:0">${sec.num}</span>
+              ${sec.nombre}
+            </div>
+            ${sec.items.map((item,ii)=>{
+              const key=`${sec.num}|${ii}`;
+              const dato=form.examenFisicoItems[key]||{checked:false,desc:""};
+              const letra=String.fromCharCode(97+ii);
+              return `<div style="padding:2px 5px;border-bottom:1px solid #e0e8f0;${dato.checked?'background:#f0fff8':''}">
+                <div style="display:flex;align-items:center;gap:4px;cursor:pointer" onclick="setEFItem('${key}','checked',!${dato.checked})">
+                  <div style="width:14px;height:14px;border:1.5px solid ${dato.checked?'#0a6a6a':'#90b0d0'};border-radius:2px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:${dato.checked?'#0a6a6a':'#fff'};font-size:10px;font-weight:900;color:#fff">${dato.checked?'✓':''}</div>
+                  <span style="font-size:10px;color:${dato.checked?'#0a6a6a':'#3a5a7a'};font-weight:${dato.checked?700:400}">${letra}. ${item}</span>
+                </div>
+                ${dato.checked?`<input type="text" value="${esc(dato.desc||'')}" placeholder="Describa hallazgo..." oninput="setEFItem('${key}','desc',this.value)" style="width:100%;border:1px solid #0a6a6a;border-radius:3px;padding:2px 5px;font-size:10px;margin-top:2px;background:#f8fffd;color:#1a2a3a;outline:none">`:''}`
+            }).join('')}
+          </td>`;
+        }
+        html+='</tr>';
+      }
+      return html;
+    })()}
+    </tbody>
+  </table>
+  </div>
+  <div style="margin-top:8px;padding:8px 10px;background:#f0f8f0;border-radius:6px;border:1px solid #c8e8c8">
+    <div style="font-size:10px;font-weight:700;color:#1a6a1a;margin-bottom:3px">📋 Regiones sin hallazgos (NORMAL):</div>
+    <div style="font-size:11px;color:#2a5a2a;font-weight:600">${(()=>{
+      const normales=Object.entries(form.examenFisicoRegiones)
+        .filter(([k,v])=>!v.checked)
+        .map(([k])=>k.split('.')[0].trim());
+      return normales.length ? 'NORMAL: '+normales.join(', ') : 'Todos los sistemas con hallazgos marcados';
+    })()}</div>
+  </div>
+  <div style="margin-top:8px">${ta('Observaciones Generales Adicionales (opcional)','examenFisicoObs',2)}</div>
+</div></div>`;}
+
+function step3(){
+  const actRows=form.actividades.map((a,i)=>`
+    <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px">
+      <span style="font-size:10px;font-weight:700;color:#1556a0;width:38px;flex-shrink:0;background:#e8eef8;padding:3px 5px;border-radius:3px;text-align:center">Act.${i+1}</span>
+      <input style="flex:1;border:1.5px solid #c8d8e8;border-radius:4px;padding:5px 8px;font-size:12px;outline:none;background:#fff;color:#1a2a3a" value="${esc(form.actividades[i])}" oninput="setAct(${i},this.value)" placeholder="Descripción actividad ${i+1}...">
+    </div>`).join('');
+  const riskRows=Object.entries(RIESGOS).map(([cat,risks])=>risks.map((r,ri)=>`<tr>
+    <td class="cat">${ri===0?cat:''}</td><td style="font-size:11px">${r}</td>
+    ${[0,1,2,3,4,5,6].map(i=>`<td style="text-align:center;padding:2px"><input type="checkbox" style="width:12px;height:12px;accent-color:#1556a0" ${(form.riesgos[r]||[])[i]?'checked':''} onchange="setRiesgo('${r.replace(/\\/g,'\\\\').replace(/'/g,"\\'")}',${i},this.checked)"></td>`).join('')}
+  </tr>`).join('')).join('');
+  return `
+<div class="card"><div class="sec">G. Factores de Riesgo del Trabajo Actual</div><div class="sb">
+  <div style="margin-bottom:10px">${inp('Puesto de Trabajo','puestoRiesgo')}</div>
+  <div class="sub-lbl">Actividades Importantes de la Jornada (hasta 7)</div>
+  ${actRows}
+  <div class="sub-lbl" style="margin-top:12px">Matriz de Riesgos — marcar actividades expuestas</div>
+  <div style="overflow-x:auto;border-radius:5px;border:1px solid #c8d8e8">
+    <table class="tbl"><thead><tr><th style="width:100px">Categoría</th><th>Factor de Riesgo</th>
+    ${[1,2,3,4,5,6,7].map(n=>`<th style="width:30px;text-align:center">A${n}</th>`).join('')}</tr></thead>
+    <tbody>${riskRows}</tbody></table>
+  </div>
+  <div style="margin-top:10px">${ta('Medidas Preventivas','medidasPreventivas',3)}</div>
+</div></div>`;}
+
+function step4(){
+  const antRows=form.antLaborales.map((al,i)=>`
+    <div class="lab-row">
+      <div class="g2" style="margin-bottom:6px">
+        <div class="fld"><label>Centro de Trabajo</label><input value="${esc(al.centro)}" oninput="setAntLab(${i},'centro',this.value)"></div>
+        <div class="fld"><label>Actividades que desempeñaba</label><input value="${esc(al.actividades)}" oninput="setAntLab(${i},'actividades',this.value)"></div>
+        <div class="fld"><label>Tiempo de Trabajo</label><input value="${esc(al.tiempo)}" oninput="setAntLab(${i},'tiempo',this.value)"></div>
+        <div class="fld"><label>Fecha IESS</label><input type="date" value="${al.fecha||''}" oninput="setAntLab(${i},'fecha',this.value)"></div>
+      </div>
+      <div class="ic">
+        <label><input type="checkbox" ${al.anterior?'checked':''} onchange="setAntLab(${i},'anterior',this.checked)" style="accent-color:#1556a0"> Anterior</label>
+        <label><input type="checkbox" ${al.actual?'checked':''} onchange="setAntLab(${i},'actual',this.checked)" style="accent-color:#1556a0"> Actual</label>
+        <label><input type="checkbox" ${al.incidente?'checked':''} onchange="setAntLab(${i},'incidente',this.checked)" style="accent-color:#c17a00"> Incidente</label>
+        <label><input type="checkbox" ${al.accidente?'checked':''} onchange="setAntLab(${i},'accidente',this.checked)" style="accent-color:#c15000"> Accidente</label>
+        <label><input type="checkbox" ${al.ep?'checked':''} onchange="setAntLab(${i},'ep',this.checked)" style="accent-color:#a01a1a"> Enf. Prof.</label>
+        <label><input type="checkbox" ${al.iesssi?'checked':''} onchange="setAntLab(${i},'iesssi',this.checked)" style="accent-color:#1e7a3a"> IESS Sí</label>
+        <label><input type="checkbox" ${al.iessno?'checked':''} onchange="setAntLab(${i},'iessno',this.checked)" style="accent-color:#a01a1a"> IESS No</label>
+      </div>
+      <div class="fld" style="margin-top:6px"><label>Especificar</label><input value="${esc(al.especificar)}" oninput="setAntLab(${i},'especificar',this.value)"></div>
+      ${form.antLaborales.length>1?`<div style="text-align:right;margin-top:4px"><button class="rm-btn" onclick="removeAntLab(${i})">× Eliminar</button></div>`:''}
+    </div>`).join('');
+  const examRows=form.examenes.map((ex,i)=>`<tr>
+    <td><input value="${esc(ex.nombre)}" oninput="setExam(${i},'nombre',this.value)" placeholder="Nombre..."></td>
+    <td><input type="date" value="${ex.fecha||''}" oninput="setExam(${i},'fecha',this.value)"></td>
+    <td><input value="${esc(ex.resultado)}" oninput="setExam(${i},'resultado',this.value)" placeholder="Resultado..."></td>
+    <td style="text-align:center">${form.examenes.length>1?`<button class="rm-btn" onclick="removeExam(${i})">×</button>`:''}</td>
+  </tr>`).join('');
+  return `
+<div class="card"><div class="sec">H. Actividad Laboral / Incidentes / Accidentes</div><div class="sb">
+  <div class="note">Antecedentes de empleos anteriores y/o trabajo actual</div>
+  ${antRows}
+  <button class="add-btn" onclick="addAntLab()">+ Agregar registro laboral</button>
+</div></div>
+<div class="card"><div class="sec sub">I. Actividades Extra Laborales</div><div class="sb">${ta('Tipo y Descripción','actExtraLaborales',2)}</div></div>
+<div class="card"><div class="sec teal">J. Resultados de Exámenes (Imagen, Laboratorio y Otros)</div><div class="sb">
+  <table class="tbl"><thead><tr><th>Nombre del Examen</th><th style="width:130px">Fecha</th><th>Resultados</th><th style="width:26px"></th></tr></thead>
+  <tbody>${examRows}</tbody></table>
+  <button class="add-btn" onclick="addExam()">+ Agregar examen</button>
+  <div style="margin-top:8px">${ta('Observaciones de Exámenes','examenesObs',2)}</div>
+</div></div>`;}
+
+const APT_TEXTO={APTO:"APTO",APTO_OBS:"APTO EN OBSERVACIÓN",APTO_LIM:"APTO CON LIMITACIONES",NO_APTO:"NO APTO"};
+function step5(){
+  const dxRows=form.diagnosticos.map((d,i)=>`<tr>
+    <td style="width:24px;text-align:center;font-weight:700;color:#5a7a9a">${i+1}</td>
+    <td style="width:100px"><input value="${esc(d.cie10)}" oninput="setDx(${i},'cie10',this.value)" placeholder="CIE-10"></td>
+    <td><input value="${esc(d.desc)}" oninput="setDx(${i},'desc',this.value)" placeholder="Descripción diagnóstica..."></td>
+    <td style="width:80px"><select onchange="setDx(${i},'tipo',this.value)" style="width:100%;font-size:11px;border:1px solid #c8d8e8;border-radius:3px;padding:3px">
+      <option value="" ${d.tipo===''?'selected':''}>—</option>
+      <option value="PRE" ${d.tipo==='PRE'?'selected':''}>PRE</option>
+      <option value="DEF" ${d.tipo==='DEF'?'selected':''}>DEF</option>
+    </select></td>
+  </tr>`).join('');
+  const aptOpts=[{v:'APTO',ic:'✔',l:'APTO'},{v:'APTO_OBS',ic:'⚠',l:'APTO EN OBSERVACIÓN'},{v:'APTO_LIM',ic:'~',l:'APTO CON LIMITACIONES'},{v:'NO_APTO',ic:'✗',l:'NO APTO'}];
+  return `
+<div class="card"><div class="sec">K. Diagnóstico — PRE: Presuntivo / DEF: Definitivo</div><div class="sb">
+  <div class="note" style="margin-bottom:8px">💡 Para examen sin hallazgos patológicos use <strong>Z00.0</strong> (Examen médico general) — se contabilizará como <em>Hallazgos normales / Paciente sano</em> en el dashboard.</div>
+  <table class="tbl"><thead><tr><th style="width:28px">#</th><th style="width:100px">CIE-10</th><th>Descripción</th><th style="width:80px">PRE/DEF</th></tr></thead><tbody>${dxRows}</tbody></table>
+</div></div>
+<div class="card"><div class="sec teal">L. Aptitud Médica para el Trabajo</div><div class="sb">
+  <div class="apt-grid">
+    ${aptOpts.map(o=>`<label class="apt-opt ${form.aptitud===o.v?'apt-'+o.v:''}">
+      <input type="radio" name="apt" value="${o.v}" ${form.aptitud===o.v?'checked':''} onchange="f('aptitud',this.value);render()" style="display:none">
+      <span style="font-size:16px">${o.ic}</span> ${o.l}</label>`).join('')}
+  </div>
+  ${ta('Observaciones de Aptitud','aptitudObs',3)}
+</div></div>
+<div class="card"><div class="sec sub">M. Recomendaciones y/o Tratamiento</div><div class="sb">${ta('Descripción de Recomendaciones','recomendaciones',4)}</div></div>
+<div class="card"><div class="sec gray">N. Retiro (Evaluación)</div><div class="sb">
+  <div class="g2">
+    ${slct('¿Se realiza la evaluación?','retiroEval',['SI','NO'])}
+    ${slct('¿Condición relacionada con el trabajo?','retiroRelacionado',['SI','NO'])}
+  </div>
+  <div style="margin-top:8px">${ta('Observación','retiroObs',2)}</div>
+</div></div>
+<div class="card"><div class="sec">O. Datos del Profesional</div><div class="sb">
+  <div class="g2">
+    ${inp('Nombres y Apellidos del Profesional','nombreProf')}
+    ${inp('Código Médico MSP','codigoMedico')}
+  </div>
+</div></div>
+<div class="dl-box">
+  <div class="dl-title">📥 Descargar Documentos</div>
+  <div class="borrador-banner" id="borrador-banner">📂 Borrador cargado — recuerda eliminarlo cuando termines</div>
+  <div class="dl-row">
+    <button class="btn-dl btn-ficha" id="btn-ficha" onclick="downloadFicha()">📋 &nbsp;Descargar Ficha Médica Ocupacional</button>
+    <button class="btn-dl btn-ficha" id="btn-consentimiento" onclick="downloadConsentimiento()" style="background:#6a1a8a">📄 &nbsp;Consentimiento Informado</button>
+  </div>
+  <button class="btn-borrador" id="btn-guardar-borrador" onclick="guardarBorrador()">💾 Guardar Borrador</button>
+  <button class="btn-eliminar-borrador" id="btn-eliminar-borrador" onclick="eliminarBorrador()">🗑 Eliminar Borrador</button>
+  <button class="btn-nuevo" onclick="nuevoRegistro()">↺ Nuevo Registro</button>
+</div>`;}
+
+// ─── RENDER ───
+function render(){
+  renderSteps();
+  const steps=[step0,step1,step2,step3,step4,step5];
+  document.getElementById('form-content').innerHTML=steps[currentStep]()+`
+    <div class="nav-bar">
+      <button class="btn-nav" onclick="gotoStep(${currentStep-1})" ${currentStep===0?'disabled':''}>← Anterior</button>
+      <span class="step-info">Paso ${currentStep+1} de ${STEPS.length} — ${STEPS[currentStep]}</span>
+      <button class="btn-nav primary" onclick="gotoStep(${currentStep+1})" ${currentStep===STEPS.length-1?'disabled':''}>Siguiente →</button>
+    </div>`;
+}
+
+function showMsg(txt,type='success'){
+  const b=document.getElementById('msg-bar');
+  b.textContent=txt;b.style.display='block';b.className='msg-bar'+(type!=='success'?` ${type}`:'');
+  setTimeout(()=>b.style.display='none',6000);
+}
+
+function setBtn(id,loading){
+  const b=document.getElementById(id);if(!b)return;
+  b.disabled=loading;
+  b.innerHTML=loading?`<span class="spin"></span> Generando...`:b.dataset.orig||b.innerHTML;
+}
+
+async function downloadFicha(){
+  const btn=document.getElementById('btn-ficha');
+  btn.dataset.orig=btn.innerHTML;btn.disabled=true;btn.innerHTML='<span class="spin"></span> Generando...';
+  try{
+    const res=await fetch('/api/descargar-ficha',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(form)});
+    if(!res.ok)throw new Error(await res.text());
+    const blob=await res.blob();
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    const cd=res.headers.get('Content-Disposition')||'';
+    const fn=cd.match(/filename\*?=(?:UTF-8'')?([^;\n]+)/)?.[1]?.replace(/"/g,'')||'FichaOcupacional.xlsx';
+    a.href=url;a.download=fn;a.click();
+    URL.revokeObjectURL(url);
+    showMsg('✔ Ficha Médica descargada. Excel con 3 hojas: Evaluación 1/3, 2/3 y 3/3.');
+  }catch(e){showMsg('Error: '+e.message,'err');}
+  btn.disabled=false;btn.innerHTML=btn.dataset.orig;
+}
+
+async function downloadCert(){
+  const btn=document.getElementById('btn-cert');
+  btn.dataset.orig=btn.innerHTML;btn.disabled=true;btn.innerHTML='<span class="spin"></span> Generando...';
+  try{
+    const res=await fetch('/api/descargar-certificado',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(form)});
+    if(!res.ok)throw new Error(await res.text());
+    const blob=await res.blob();
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    const cd=res.headers.get('Content-Disposition')||'';
+    const fn=cd.match(/filename\*?=(?:UTF-8'')?([^;\n]+)/)?.[1]?.replace(/"/g,'')||'CertificadoAptitud.xlsx';
+    a.href=url;a.download=fn;a.click();
+    URL.revokeObjectURL(url);
+    showMsg('✔ Certificado de Aptitud descargado correctamente.');
+  }catch(e){showMsg('Error: '+e.message,'err');}
+  btn.disabled=false;btn.innerHTML=btn.dataset.orig;
+}
+
+async function downloadConsentimiento(){
+  const btn=document.getElementById('btn-consentimiento');
+  btn.dataset.orig=btn.innerHTML;btn.disabled=true;btn.innerHTML='<span class="spin"></span> Generando...';
+  try{
+    const res=await fetch('/api/descargar-consentimiento',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(form)});
+    if(!res.ok)throw new Error(await res.text());
+    const blob=await res.blob();
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    const cd=res.headers.get('Content-Disposition')||'';
+    const fn=cd.match(/filename\*?=(?:UTF-8'')?([^;\n]+)/)?.[1]?.replace(/"/g,'')||'ConsentimientoInformado.docx';
+    a.href=url;a.download=fn;a.click();
+    URL.revokeObjectURL(url);
+    showMsg('✔ Consentimiento Informado descargado correctamente.');
+  }catch(e){showMsg('Error: '+e.message,'err');}
+  btn.disabled=false;btn.innerHTML=btn.dataset.orig;
+}
+
+// ─── BORRADORES ───────────────────────────────────────────────
+let _borradorActivo = false;
+
+function _actualizarUIBorrador(activo){
+  _borradorActivo = activo;
+  const banner = document.getElementById('borrador-banner');
+  const btnEl  = document.getElementById('btn-eliminar-borrador');
+  if(banner) banner.style.display = activo ? 'block' : 'none';
+  if(btnEl)  btnEl.style.display  = activo ? 'block' : 'none';
+}
+
+async function guardarBorrador(){
+  const cedula = (form.cedula || form.nroHistoria || '').trim();
+  if(!cedula){ showMsg('Ingresa la cédula antes de guardar el borrador.','err'); return; }
+  const btn = document.getElementById('btn-guardar-borrador');
+  if(btn){ btn.disabled=true; btn.innerHTML='<span class="spin"></span> Guardando...'; }
+  try{
+    const res = await fetch('/api/borrador/guardar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(form)});
+    const data = await res.json();
+    if(!data.ok) throw new Error(data.error||'Error al guardar');
+    _actualizarUIBorrador(true);
+
+    const nombre = data.nombre || '';
+    showMsg('💾 ' + (nombre ? nombre + ' guardado' : 'Borrador guardado') + ' correctamente en la Matriz.');
+
+    // ── AGREGAR INMEDIATAMENTE A matrizData LOCAL ──────────────────
+    // Construir registro con los mismos campos que usa la matriz
+    const APTMAP = {'APTO':'APTO','APTO_OBS':'APTO EN OBSERVACIÓN','APTO_LIM':'APTO CON LIMITACIONES','NO_APTO':'NO APTO'};
+    const aptTexto = APTMAP[form.aptitud||''] || form.aptitud || '';
+    const nomCompleto = [form.primerApellido,form.segundoApellido,form.primerNombre,form.segundoNombre].filter(Boolean).join(' ').trim();
+    const gps = [];
+    if(form.embarazada)       gps.push('Embarazada');
+    if(form.discapacidad)     gps.push('Persona con Discapacidad');
+    if(form.enfCatastrofica)  gps.push('Enfermedad Catastrófica');
+    if(form.adultoMayor)      gps.push('Adulto Mayor (>65)');
+
+    // Diagnósticos
+    const dxs = form.diagnosticos || [];
+
+    const nuevoReg = {
+      '_id': 'local-'+Date.now(),
+      'N°': matrizData.length + 1,
+      'N.° de historia clínica': cedula,
+      'NOMBRE COMPLETO': nomCompleto,
+      'SEXO': form.sexo||'',
+      'EDAD (años)': form.edad||'',
+      'Fecha de ingreso': form.fechaIngreso||'',
+      'Puesto / cargo (CIUO)': form.puestoCIUO||'',
+      'Empresa / institución': form.institucion||form.establecimiento||'',
+      'Fecha de atención': form.fechaAtencion||'',
+      'Aptitud': aptTexto,
+      'Observaciones de aptitud': form.aptitudObs||'',
+      'GRUPO AT. PRIORITARIA': gps.join(', ')||'NO',
+      'Tipo de diagnóstico': form.tipoDiagnostico||'',
+      'Recomendaciones': form.recomendaciones||'',
+      'Médico responsable': form.nombreProf||'',
+    };
+    // Agregar diagnósticos individuales
+    for(let i=0;i<6;i++){
+      const dx=dxs[i]||{};
+      nuevoReg['DIAGNÓSTICO '+(i+1)+' CIE-10'] = dx.cie10||'';
+      nuevoReg['DESCRIPCIÓN DX'+(i+1)] = dx.desc||'';
+      nuevoReg['Tipo Dx'+(i+1)] = dx.tipoDx||form.tipoDiagnostico||'';
+    }
+
+    // ¿Ya existe una fila con la misma cédula? → actualizar
+    const idxExist = matrizData.findIndex(r=>r['N.° de historia clínica']===cedula);
+    if(idxExist>=0){
+      nuevoReg['_id'] = matrizData[idxExist]['_id'];
+      nuevoReg['N°']  = matrizData[idxExist]['N°'];
+      matrizData[idxExist] = nuevoReg;
+    } else {
+      matrizData.push(nuevoReg);
+    }
+
+    // Persistir y renderizar
+    try{ localStorage.setItem('femo_matrizData', JSON.stringify(matrizData)); }catch(e){}
+
+    // Si el dashboard está abierto → refrescar vista
+    if(dashVisible){
+      renderMatriz();
+      // También obtener el _id real de Supabase en segundo plano
+      setTimeout(async()=>{
+        try{
+          const r2=await fetch('/api/matriz/lista');
+          const raw=await r2.json();
+          const lista=Array.isArray(raw)?raw:[];
+          if(lista.length>0){
+            matrizData=lista;
+            try{ localStorage.setItem('femo_matrizData',JSON.stringify(matrizData)); }catch(e){}
+            renderMatriz();
+          }
+        }catch(ex){ console.warn('Sync Supabase:', ex.message); }
+      }, 1500);
+    }
+    // ────────────────────────────────────────────────────────────────
+
+  }catch(e){ showMsg('Error: '+e.message,'err'); }
+  if(btn){ btn.disabled=false; btn.innerHTML='💾 Guardar Borrador'; }
+}
+
+async function cargarBorrador(cedula){
+  try{
+    const res = await fetch(`/api/borrador/${encodeURIComponent(cedula)}`);
+    if(res.status===404) return;
+    const data = await res.json();
+    if(!data.ok) return;
+    Object.assign(form, data.data);
+    _actualizarUIBorrador(true);
+    render();
+    showMsg('📂 Borrador encontrado y cargado automáticamente.');
+  }catch(e){ /* silencioso */ }
+}
+
+async function eliminarBorrador(){
+  const cedula = (form.cedula || form.nroHistoria || '').trim();
+  if(!cedula) return;
+  if(!confirm('¿Eliminar el borrador guardado para cédula '+cedula+'?')) return;
+  try{
+    const res = await fetch(`/api/borrador/${encodeURIComponent(cedula)}`,{method:'DELETE'});
+    const data = await res.json();
+    if(!data.ok) throw new Error(data.error||'Error al eliminar');
+    _actualizarUIBorrador(false);
+    showMsg('🗑 Borrador eliminado correctamente.');
+  }catch(e){ showMsg('Error: '+e.message,'err'); }
+}
+
+// Auto-búsqueda cuando se escribe la cédula (con debounce 600ms)
+let _cedulaTimer = null;
+document.addEventListener('input', function(e){
+  if(e.target && e.target.dataset && e.target.dataset.key === 'cedula'){
+    const val = e.target.value.trim();
+    clearTimeout(_cedulaTimer);
+    if(val.length >= 8){
+      _cedulaTimer = setTimeout(()=>cargarBorrador(val), 600);
+    }
+  }
+});
+
+async function addToMatriz(){
+  const btn=document.getElementById('btn-mat');
+  if(btn){btn.dataset.orig=btn.innerHTML;btn.disabled=true;btn.innerHTML='<span class="spin"></span> Agregando...';}
+  try{
+    const res=await fetch('/api/agregar-matriz',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(form)});
+    const data=await res.json();
+    if(!data.ok)throw new Error('Error al agregar');
+    matrizCount=data.total;
+    updateMatrizUI(data.total);
+    showMsg(`✔ "${data.nombre}" agregado/a a la Matriz. Total: ${data.total} registro(s).`);
+    render();
+    if(dashVisible){ setTimeout(()=>{ cargarMatriz(); }, 600); }
+  }catch(e){showMsg('Error: '+e.message,'err');}
+  if(btn){btn.disabled=false;btn.innerHTML=btn.dataset.orig||'Agregar a Matriz';}
+}
+
+async function downloadMatriz(){
+  try{
+    const res=await fetch('/api/descargar-matriz');
+    if(!res.ok)throw new Error(await res.text());
+    const blob=await res.blob();
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    const cd=res.headers.get('Content-Disposition')||'';
+    const fn=cd.match(/filename\*?=(?:UTF-8'')?([^;\n]+)/)?.[1]?.replace(/"/g,'')||'Matriz.xlsx';
+    a.href=url;a.download=fn;a.click();
+    URL.revokeObjectURL(url);
+    showMsg('✔ Matriz descargada.');
+  }catch(e){showMsg('Error: '+e.message,'err');}
+}
+
+async function clearMatriz(){
+  if(!confirm(`¿Eliminar todos los ${matrizCount} registros? Esta acción no se puede deshacer.`))return;
+  const res=await fetch('/api/limpiar-matriz',{method:'POST'});
+  const data=await res.json();
+  matrizCount=0;
+  updateMatrizUI(0,[]);
+  showMsg('Matriz limpiada.','warn');render();
+}
+
+function nuevoRegistro(){
+  if(!confirm('¿Iniciar nuevo registro? Se perderán los datos actuales del formulario.'))return;
+  form={...form};
+  const keys=Object.keys(form);
+  keys.forEach(k=>{
+    if(typeof form[k]==='string')form[k]='';
+    else if(typeof form[k]==='boolean')form[k]=false;
+  });
+  form.actividades=["","","","","","",""];
+  form.riesgos=initRiesgos();
+  form.examenFisicoItems=initEFItems();
+  form.antLaborales=[{centro:"",actividades:"",anterior:false,actual:false,tiempo:"",incidente:false,accidente:false,ep:false,iesssi:false,iessno:false,fecha:"",especificar:""}];
+  form.examenes=[{nombre:"",fecha:"",resultado:""}];
+  form.diagnosticos=[{cie10:"",desc:"",tipo:""},{cie10:"",desc:"",tipo:""},{cie10:"",desc:"",tipo:""},{cie10:"",desc:"",tipo:""},{cie10:"",desc:"",tipo:""},{cie10:"",desc:"",tipo:""}];
+  form.examenFisicoRegiones={
+    "1. Piel":{checked:false,hallazgo:""},"2. Ojos":{checked:false,hallazgo:""},
+    "3. Oído":{checked:false,hallazgo:""},"4. Orofaringe":{checked:false,hallazgo:""},
+    "5. Nariz":{checked:false,hallazgo:""},"6. Cuello":{checked:false,hallazgo:""},
+    "7. Tórax/Mamas":{checked:false,hallazgo:""},"8. Tórax/Pulmones-Corazón":{checked:false,hallazgo:""},
+    "9. Abdomen":{checked:false,hallazgo:""},"10. Columna":{checked:false,hallazgo:""},
+    "11. Pelvis/Genitales":{checked:false,hallazgo:""},"12. Extremidades/Vascular":{checked:false,hallazgo:""},
+    "13. Neurológico":{checked:false,hallazgo:""}
+  };
+  form.nombreProf="Dr. Martín Lino Zambrano";
+  currentStep=0;render();
+}
+
+function updateMatrizUI(total){
+  // Solo actualizar elementos que aún existen
+  const panel=document.getElementById('mat-panel');
+  if(panel) panel.style.display=total>0?'block':'none';
+  if(total>0){
+    fetch('/api/conteo-matriz').then(r=>r.json()).then(data=>{
+      const el=document.getElementById('mat-names');
+      if(el) el.textContent=data.nombres.join('  |  ');
+    }).catch(()=>{});
+  }
+}
+
+// Init
+render();
+
+// Cargar conteo de la matriz al iniciar
+fetch('/api/conteo-matriz').then(r=>r.json()).then(data=>{
+  updateMatrizUI(data.total);
+}).catch(()=>{});
+
+// ── Dashboard ─────────────────────────────────────────────
+let dashVisible = false;
+
+function toggleDashboard(){
+  dashVisible = !dashVisible;
+  document.getElementById('dashboard-panel').style.display = dashVisible ? 'block' : 'none';
+  document.getElementById('form-content').style.display   = dashVisible ? 'none'  : 'block';
+  if(dashVisible){ showDTab('matriz'); }
+}
+
+
+// ════════════════════════════════════════════════════════════
+//  DASHBOARD — generado desde matrizData
+// ════════════════════════════════════════════════════════════
+var _charts = {};
+
+function mkChart(id, type, labels, datasets, opts){
+  if(_charts[id]){ try{_charts[id].destroy();}catch(e){} }
+  var ctx = document.getElementById(id);
+  if(!ctx) return;
+  _charts[id] = new Chart(ctx, {
+    type: type,
+    data: {labels: labels, datasets: datasets},
+    options: Object.assign({
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {legend: {position:'bottom', labels:{font:{size:10}, padding:8}}}
+    }, opts||{})
+  });
+}
+
+function actualizarProgreso(){
+  var pN = parseInt(document.getElementById('inp-planificadas').value||'25');
+  localStorage.setItem('femo_planN', pN);
+  var tot = matrizData.length;
+  var pct = Math.min(Math.round(tot/pN*100), 100);
+  var fill = document.getElementById('prog-barra');
+  var txt  = document.getElementById('prog-texto');
+  if(fill){
+    fill.style.width = pct+'%';
+    fill.style.background = pct>=100
+      ? 'linear-gradient(90deg,#1e7a3a,#27ae60)'
+      : pct>=60 ? 'linear-gradient(90deg,#c17a00,#f39c12)'
+      : 'linear-gradient(90deg,#a01a1a,#e74c3c)';
+  }
+  if(txt) txt.textContent = tot+' / '+pN+' ('+pct+'%) — '+Math.max(pN-tot,0)+' pendientes';
+}
+
+function renderDashboard(){
+  if(!matrizData.length){
+    document.getElementById('dash-kpis').innerHTML =
+      '<div style="grid-column:1/-1;text-align:center;padding:30px;color:#aaa">'
+      +'<div style="font-size:28px;margin-bottom:8px">📊</div>'
+      +'<div style="font-size:12px">Agrega evaluaciones a la Matriz para ver el Dashboard</div></div>';
+    return;
+  }
+
+  var PAL = ['#1556a0','#27ae60','#e74c3c','#f39c12','#9b59b6','#1abc9c',
+             '#e67e22','#3498db','#e91e63','#00bcd4','#ff5722','#607d8b',
+             '#16a085','#d35400','#8e44ad'];
+  var ACOL = {
+    'APTO':'#27ae60','APTO EN OBSERVACIÓN':'#f39c12',
+    'APTO CON LIMITACIONES':'#e67e22','NO APTO':'#e74c3c'
+  };
+  var CIE_SIS = {
+    'E78':'Cardiovascular/Lipídico','E66':'Metabólico','E79':'Metabólico',
+    'R74':'Hepático','D64':'Hematológico','D50':'Hematológico',
+    'R73':'Metabólico','E10':'Metabólico','E11':'Metabólico',
+    'I10':'Cardiovascular/Lipídico','E03':'Metabólico','M41':'Osteomuscular',
+    'H90':'Auditivo','B82':'Digestivo','J02':'Respiratorio/ORL',
+    'J45':'Respiratorio/ORL','N18':'Urológico','K74':'Hepático',
+    'F32':'Neurológico','F41':'Neurológico','M05':'Osteomuscular',
+    'J44':'Respiratorio/ORL','M54':'Osteomuscular','R80':'Renal'
+  };
+  var EXCL = ['z00','examen medico','examen ocupacional','examen general',
+              'evaluacion medica','medico general','medico ocupacional'];
+
+  var tot = matrizData.length;
+  var p   = function(n){ return tot ? Math.round(n/tot*100)+'%' : '—'; };
+
+  // Contadores
+  var sx={}, ag={'18-25':0,'26-35':0,'36-45':0,'46-55':0,'56-65':0,'>65':0};
+  var apt={}, ca={}, dx_cnt={}, sis_cnt={}, ecnt_cnt={}, gs={};
+  var gp={'Embarazada':0,'Adulto Mayor >65':0,'Discapacidad':0,'Enf. Catastrófica':0};
+  var imc_c={'Bajo peso':0,'Normal':0,'Sobrepeso':0,'Obesidad I':0,'Obesidad II':0,'N/D':0};
+  var tipoDx_cnt={'Paciente sano':0,'Enfermedad general':0,'Enfermedad crónica no transmisible':0,'Enfermedad catastrófica':0};
+  var sumAge=0, cntAge=0, ecntPacs=0;
+
+  matrizData.forEach(function(r){
+    // Sexo
+    var sex=(r['SEXO']||'N/D').trim();
+    sx[sex]=(sx[sex]||0)+1;
+    // Edad
+    var age=parseInt(r['EDAD (años)']||0);
+    if(age>0){sumAge+=age;cntAge++;}
+    var agk=age<26?'18-25':age<36?'26-35':age<46?'36-45':age<56?'46-55':age<66?'56-65':age>=66?'>65':'N/D';
+    if(ag[agk]!==undefined) ag[agk]++;
+    // Aptitud
+    var a=(r['Aptitud']||'N/D').trim().toUpperCase();
+    var aLabel=a==='APTO'?'Apto':a==='APTO EN OBSERVACIÓN'?'En Observación':a==='APTO CON LIMITACIONES'?'Con Limitaciones':a==='NO APTO'?'No Apto':'N/D';
+    apt[aLabel]=(apt[aLabel]||0)+1;
+    // Cargo
+    var c=(r['Puesto / cargo (CIUO)']||'N/D').trim();
+    ca[c]=(ca[c]||0)+1;
+    // Grupo sanguíneo
+    var gv=(r['GRUPO SANGUÍNEO']||'N/D').trim();
+    gs[gv]=(gs[gv]||0)+1;
+    // IMC
+    var im=parseFloat(r['IMC (kg/m²)']||0);
+    var ik=im<=0?'N/D':im<18.5?'Bajo peso':im<25?'Normal':im<30?'Sobrepeso':im<35?'Obesidad I':'Obesidad II';
+    imc_c[ik]++;
+    // Grupos prioritarios
+    var gpS=r['GRUPO AT. PRIORITARIA']||'';
+    if(gpS.includes('Embarazada'))       gp['Embarazada']++;
+    if(gpS.includes('Mayor')||age>=65)   gp['Adulto Mayor >65']++;
+    if(gpS.includes('Discapacidad'))     gp['Discapacidad']++;
+    if(gpS.includes('Catastrófica'))     gp['Enf. Catastrófica']++;
+    // Tipo de diagnóstico general
+    var tdx=(r['Tipo de diagnóstico']||'').trim();
+    if(tdx && tipoDx_cnt[tdx]!==undefined) tipoDx_cnt[tdx]++;
+    else if(!tdx) tipoDx_cnt['Paciente sano']++;
+    // Diagnósticos individuales — solo descripción, sin CIE-10
+    var hasEcnt=false;
+    for(var n=1;n<=6;n++){
+      var cie=(r['DIAGNÓSTICO '+n+' CIE-10']||'').trim();
+      var desc=(r['DESCRIPCIÓN DX'+n]||'').trim();
+      if(!desc) continue;                         // saltar solo si no hay descripción
+      var dl=desc.toLowerCase();
+      if(EXCL.some(function(ex){return dl.indexOf(ex)>=0;})) continue;
+      dx_cnt[desc]=(dx_cnt[desc]||0)+1;           // clave = descripción
+      // Sistemas (si aún tiene CIE-10 registrado)
+      if(cie && !cie.toUpperCase().startsWith('Z')){
+        var s3=cie.substring(0,3);
+        var sis=CIE_SIS[s3];
+        if(sis) sis_cnt[sis]=(sis_cnt[sis]||0)+1;
+        var ecntNombre=resolverECNT(cie);
+        if(ecntNombre){ecnt_cnt[ecntNombre]=(ecnt_cnt[ecntNombre]||0)+1;hasEcnt=true;}
+      }
+    }
+    if(hasEcnt) ecntPacs++;
+  });
+
+  var avgAge=cntAge?Math.round(sumAge/cntAge):0;
+  var aptoN=apt['Apto']||0, obsN=apt['En Observación']||0;
+  var limN=apt['Con Limitaciones']||0, naN=apt['No Apto']||0;
+
+  // Progreso
+  var pN=parseInt(localStorage.getItem('femo_planN')||'25');
+  var pinp=document.getElementById('inp-planificadas');
+  if(pinp) pinp.value=pN;
+  actualizarProgreso();
+
+  // KPIs
+  var kpis=[
+    {v:tot,         l:'Total evaluados',      c:'#1556a0'},
+    {v:aptoN,       l:'Apto',                 c:'#27ae60', s:p(aptoN)},
+    {v:obsN,        l:'En observación',       c:'#f39c12', s:p(obsN)},
+    {v:limN,        l:'Con limitación',       c:'#e67e22', s:p(limN)},
+    {v:naN,         l:'No apto',              c:'#e74c3c', s:p(naN)},
+    {v:ecntPacs,    l:'Con ECNT',             c:'#8e44ad', s:p(ecntPacs)},
+    {v:avgAge||'—', l:'Edad promedio',        c:'#2980b9', s:'años'},
+    {v:Object.keys(ca).length, l:'Cargos',   c:'#16a085'},
+  ];
+  document.getElementById('dash-kpis').innerHTML=kpis.map(function(k){
+    return '<div class="kpi-card">'
+      +'<div class="kpi-val" style="color:'+k.c+'">'+k.v+'</div>'
+      +'<div class="kpi-lbl">'+k.l+'</div>'
+      +(k.s?'<div style="font-size:9px;color:#999">'+k.s+'</div>':'')
+      +'</div>';
+  }).join('');
+
+  // Chart: Sexo
+  var sxK=Object.keys(sx), sxV=Object.values(sx), sxC=['#1556a0','#e91e63','#9b59b6'];
+  var legGen=document.getElementById('leg-gen');
+  if(legGen) legGen.innerHTML=sxK.map(function(k,i){
+    return '<span style="display:flex;align-items:center;gap:3px;font-size:10px">'
+      +'<span style="width:8px;height:8px;border-radius:2px;background:'+(sxC[i]||'#ccc')+'"></span>'+k+': '+sxV[i]+'</span>';
+  }).join('');
+  mkChart('ch-genero','doughnut',sxK,[{data:sxV,backgroundColor:sxC,borderWidth:0}],{cutout:'55%'});
+
+  // Chart: Edad
+  mkChart('ch-edad','bar',Object.keys(ag),[{
+    label:'Personas',data:Object.values(ag),backgroundColor:PAL,borderRadius:4,borderWidth:0
+  }],{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0,font:{size:10}}},x:{ticks:{font:{size:10}}}}});
+
+  // Chart: Aptitud
+  var aptK=Object.keys(apt), aptV=Object.values(apt);
+  var legApt=document.getElementById('leg-apt');
+  if(legApt) legApt.innerHTML=aptK.map(function(k,i){
+    var ac={'Apto':'#27ae60','En Observación':'#f39c12','Con Limitaciones':'#e67e22','No Apto':'#e74c3c'};
+    return '<span style="display:flex;align-items:center;gap:3px;font-size:10px">'
+      +'<span style="width:8px;height:8px;border-radius:2px;background:'+(ac[k]||'#ccc')+'"></span>'+k+': '+aptV[i]+'</span>';
+  }).join('');
+  mkChart('ch-aptitud','bar',aptK,[{
+    label:'Personas',data:aptV,
+    backgroundColor:aptK.map(function(k){return {'Apto':'#27ae60','En Observación':'#f39c12','Con Limitaciones':'#e67e22','No Apto':'#e74c3c'}[k]||'#ccc';}),
+    borderRadius:4,borderWidth:0
+  }],{indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{precision:0,font:{size:10}}},y:{ticks:{font:{size:10}}}}});
+
+  // Chart: IMC
+  var imcC={'Bajo peso':'#3498db','Normal':'#27ae60','Sobrepeso':'#f39c12','Obesidad I':'#e67e22','Obesidad II':'#e74c3c','N/D':'#bdc3c7'};
+  mkChart('ch-imc','bar',Object.keys(imc_c),[{
+    label:'Personas',data:Object.values(imc_c),
+    backgroundColor:Object.keys(imc_c).map(function(k){return imcC[k]||'#ccc';}),
+    borderRadius:4,borderWidth:0
+  }],{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0,font:{size:10}}},x:{ticks:{font:{size:10}}}}});
+
+  // Chart: Cargos
+  var caE=Object.entries(ca).sort(function(a,b){return b[1]-a[1];}).slice(0,12);
+  var bcargos=document.getElementById('box-cargos');
+  if(bcargos) bcargos.style.height=Math.max(caE.length*36+50,150)+'px';
+  mkChart('ch-cargos','bar',caE.map(function(e){return e[0];}), [{
+    label:'Evaluados',data:caE.map(function(e){return e[1];}),
+    backgroundColor:'#1556a0',borderRadius:4,borderWidth:0
+  }],{indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{precision:0,font:{size:10}}},y:{ticks:{font:{size:9}}}}});
+
+  // Chart: Diagnósticos CIE-10
+  var dxE=Object.entries(dx_cnt).sort(function(a,b){return b[1]-a[1];}).slice(0,12);
+  var bdx=document.getElementById('box-dx');
+  if(bdx) bdx.style.height=Math.max(dxE.length*34+50,150)+'px';
+  if(dxE.length){
+    var dxTotal=dxE.reduce(function(s,e){return s+e[1];},0);
+    // Plugin inline para labels con cantidad + porcentaje en cada barra
+    var _dxLabelPlugin = {
+      id:'dxLabels',
+      afterDatasetsDraw:function(chart){
+        var ctx2=chart.ctx;
+        var ds=chart.data.datasets[0];
+        var meta=chart.getDatasetMeta(0);
+        ctx2.save();
+        ctx2.font='bold 9px Arial';
+        ctx2.fillStyle='#5a1a8a';
+        ctx2.textBaseline='middle';
+        meta.data.forEach(function(bar,i){
+          var val=ds.data[i];
+          var pct=dxTotal>0?Math.round(val/dxTotal*100):0;
+          var txt=val+' ('+pct+'%)';
+          ctx2.fillText(txt, bar.x+5, bar.y);
+        });
+        ctx2.restore();
+      }
+    };
+    if(_charts['ch-dx']){ try{_charts['ch-dx'].destroy();}catch(e){} }
+    var ctx2=document.getElementById('ch-dx');
+    if(ctx2){
+      _charts['ch-dx']=new Chart(ctx2,{
+        type:'bar',
+        data:{
+          labels:dxE.map(function(e){return e[0].length>52?e[0].substring(0,52)+'…':e[0];}),
+          datasets:[{
+            label:'Casos',
+            data:dxE.map(function(e){return e[1];}),
+            backgroundColor:'#8e44ad',borderRadius:4,borderWidth:0
+          }]
+        },
+        options:{
+          indexAxis:'y',
+          responsive:true,
+          maintainAspectRatio:false,
+          layout:{padding:{right:72}},
+          plugins:{
+            legend:{display:false},
+            tooltip:{
+              backgroundColor:'rgba(10,30,60,0.92)',
+              titleColor:'#a8c8ef',bodyColor:'#fff',
+              titleFont:{size:11,weight:'bold'},bodyFont:{size:12,weight:'bold'},
+              padding:10,cornerRadius:6,
+              callbacks:{
+                label:function(ctx){
+                  var val=ctx.raw||0;
+                  var pct=dxTotal>0?Math.round(val/dxTotal*100):0;
+                  return '  '+val+' caso'+(val!==1?'s':'')+' — '+pct+'%';
+                }
+              }
+            }
+          },
+          scales:{
+            x:{beginAtZero:true,ticks:{precision:0,font:{size:10}}},
+            y:{ticks:{font:{size:9}}}
+          }
+        },
+        plugins:[_dxLabelPlugin]
+      });
+    }
+  }
+
+  // Chart: Sistemas afectados
+  var siE=Object.entries(sis_cnt).sort(function(a,b){return b[1]-a[1];});
+  var bsis=document.getElementById('box-sis');
+  if(bsis) bsis.style.height=Math.max(siE.length*34+50,120)+'px';
+  var sisColors={'Cardiovascular/Lipídico':'#e74c3c','Metabólico':'#f39c12','Hepático':'#e67e22','Hematológico':'#e91e63','Respiratorio/ORL':'#3498db','Auditivo':'#1abc9c','Digestivo':'#9b59b6','Urológico':'#2980b9','Osteomuscular':'#8e44ad','Neurológico':'#16a085','Renal':'#1abc9c'};
+  if(siE.length){
+    mkChart('ch-sistemas','bar',siE.map(function(e){return e[0];}), [{
+      label:'Pacientes',data:siE.map(function(e){return e[1];}),
+      backgroundColor:siE.map(function(e){return sisColors[e[0]]||'#607d8b';}),
+      borderRadius:4,borderWidth:0
+    }],{indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{precision:0,font:{size:10}}},y:{ticks:{font:{size:10}}}}});
+  }
+
+  // Chart: ECNT
+  var ecE=Object.entries(ecnt_cnt).sort(function(a,b){return b[1]-a[1];});
+  if(ecE.length){
+    mkChart('ch-ecnt','bar',ecE.map(function(e){return e[0];}), [{
+      label:'Pacientes',data:ecE.map(function(e){return e[1];}),
+      backgroundColor:PAL,borderRadius:4,borderWidth:0
+    }],{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0,font:{size:10}}},x:{ticks:{font:{size:10},maxRotation:25}}}});
+  }
+
+  // Chart: Grupos prioritarios
+  var gpK=Object.keys(gp), gpV=Object.values(gp);
+  mkChart('ch-gp','bar',gpK,[{
+    label:'Personas',data:gpV,
+    backgroundColor:['#e91e63','#f39c12','#3498db','#e74c3c'],
+    borderRadius:4,borderWidth:0
+  }],{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0,font:{size:10}}},x:{ticks:{font:{size:10}}}}});
+
+  // Chart: Grupos sanguíneos
+  mkChart('ch-gs','bar',Object.keys(gs),[{
+    label:'Personas',data:Object.values(gs),backgroundColor:PAL,
+    borderRadius:4,borderWidth:0
+  }],{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0,font:{size:10}}},x:{ticks:{font:{size:10}}}}});
+}
+
+function showDTab(tab){
+  var allTabs=['matriz','ingreso','periodico','reintegro','egreso','dashboard','config'];
+  allTabs.forEach(function(t){
+    var el  = document.getElementById('dtab-'+t);
+    var btn = document.getElementById('dtab-btn-'+t);
+    if(el)  el.style.display  = t===tab ? 'block' : 'none';
+    if(btn) btn.classList.toggle('active', t===tab);
+  });
+
+  // Siempre recargar desde Supabase y luego renderizar el tab correcto
+  var _render = function(){
+    if(tab==='matriz'){
+      if(!matEmpresa){ matEmpresa=localStorage.getItem('femo_matrizEmpresa')||''; }
+      var empInp=document.getElementById('mat-empresa');
+      if(empInp && matEmpresa && !empInp.value) empInp.value=matEmpresa;
+      renderMatriz();
+    } else if(tab==='ingreso'||tab==='periodico'||tab==='reintegro'||tab==='egreso'){
+      renderTipoTabla(tab, filtrarPorTipo(tab));
+    } else if(tab==='dashboard'){
+      if(matrizData.length>0) elegirFuenteDashboard(_dashFuente);
+    } else if(tab==='config'){
+      renderTablaECNT();
+    }
+  };
+
+  if(tab==='config'){ renderTablaECNT(); return; }
+
+  // Cargar siempre desde Supabase
+  cargarMatriz().then(_render).catch(function(){ _render(); });
+}
+
+// ════════════════════════════════════════════════════════════
+//  MATRIZ — datos y renderizado
+// ════════════════════════════════════════════════════════════
+// Cargar desde localStorage al iniciar
+let matrizData = (()=>{
+  try{ const s=localStorage.getItem('femo_matrizData'); return s?JSON.parse(s):[]; }
+  catch(e){ return []; }
+})();
+let matEmpresa = localStorage.getItem('femo_matrizEmpresa')||'';
+
+function calcAnios(fi){
+  if(!fi) return '';
+  try{
+    const d=new Date(fi); if(isNaN(d)) return '';
+    const h=new Date(); let a=h.getFullYear()-d.getFullYear();
+    if(h.getMonth()<d.getMonth()||(h.getMonth()===d.getMonth()&&h.getDate()<d.getDate())) a--;
+    return a>=0?String(a):'';
+  }catch(e){ return ''; }
+}
+
+function getPlanN(){ return parseInt(localStorage.getItem('femo_planN')||'25'); }
+
+async function cargarMatriz(forzar=false){
+  const tbody = document.getElementById('mat-tbody');
+  // Solo mostrar spinner si no hay datos
+  if(matrizData.length===0 && tbody){
+    tbody.innerHTML='<tr><td colspan="13" style="text-align:center;padding:30px;color:#aaa"><div style="display:inline-block;width:20px;height:20px;border:3px solid #1556a0;border-top-color:transparent;border-radius:50%;animation:spin .8s linear infinite"></div></td></tr>';
+  }
+  try{
+    const r = await fetch('/api/matriz/lista');
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const raw = await r.json();
+    const lista = Array.isArray(raw) ? raw : [];
+
+    // REGLA: solo reemplazar matrizData si Supabase devuelve datos reales
+    if(lista.length > 0){
+      matrizData = lista;
+      console.log('✓ Supabase: '+lista.length+' registros');
+    } else if(forzar){
+      matrizData = []; // reset explícito
+      console.log('⚠ Recargar forzado → vacío');
+    } else {
+      // Supabase devolvió vacío pero NO forzamos → conservar datos locales
+      console.log('⚠ Supabase vacío → conservando '+matrizData.length+' registros locales');
+      renderMatriz();
+      return;
+    }
+
+    const cntEl = document.getElementById('mat-count');
+    if(cntEl) cntEl.textContent = matrizData.length+' evaluado'+(matrizData.length!==1?'s':'');
+    renderMatriz();
+    // Si el Dashboard está visible, actualizarlo también
+    const dashTab = document.getElementById('dtab-dashboard');
+    if(dashTab && dashTab.style.display !== 'none') renderDashboard();
+    // Persistir en localStorage
+    try{ localStorage.setItem('femo_matrizData', JSON.stringify(matrizData)); }catch(ex){}
+  }catch(e){
+    console.error('cargarMatriz error:', e.message);
+    if(matrizData.length > 0){ renderMatriz(); return; }
+    if(tbody){ const em=document.createElement('tr'); em.innerHTML='<td colspan=13 style=text-align:center;padding:24px;color:#c0392b>Error: '+e.message+'</td>'; tbody.appendChild(em); }
+  }
+}
+
+function filtrarRegistros(){}
+function matEmpresaChange(){
+  matEmpresa = document.getElementById('mat-empresa').value;
+  try{ localStorage.setItem('femo_matrizEmpresa', matEmpresa); }catch(e){}
+  document.getElementById('mat-empresa-footer').textContent =
+    (matEmpresa||'CASISO S.A.S.')+' — Dr. Martín Lino Zambrano';
+}
+
+function calcAnios(fi){
+  if(!fi) return '';
+  try{
+    const d=new Date(fi); if(isNaN(d)) return '';
+    const h=new Date(); let a=h.getFullYear()-d.getFullYear();
+    if(h.getMonth()<d.getMonth()||(h.getMonth()===d.getMonth()&&h.getDate()<d.getDate())) a--;
+    return a>=0?String(a):'';
+  }catch(e){ return ''; }
+}
+
+function getDiagnosticos(r){
+  const EXCLUIR=['z00','examen medico general','examen medico ocupacional','examen medico',
+    'examen ocupacional','examen general','evaluacion medica','evaluacion ocupacional',
+    'medico general','medico ocupacional','sin hallazgo','normal'];
+  const dxList=[];
+  const dxPares=[];
+  for(let n=1;n<=6;n++){
+    const keyC='DIAGNÓSTICO '+n+' CIE-10';
+    const keyD='DESCRIPCIÓN DX'+n;
+    const cie=(r[keyC]||'').trim();
+    const desc=(r[keyD]||'').trim();
+    if(cie.trim()) dxPares.push([cie.trim(),desc.trim()]);
+  }
+  if(!dxPares.length){
+    // Solo descripción, sin CIE-10
+    for(var _dn=1;_dn<=6;_dn++){
+      var _dd=(r['DESCRIPCIÓN DX'+_dn]||'').trim();
+      if(_dd) dxPares.push(['',_dd]);
+    }
+  }
+  dxPares.forEach(function(pair){
+    var cie=pair[0]; var desc=pair[1];
+    if(!cie) return;
+    if(cie.toUpperCase().startsWith('Z')) return;
+    const descLow=desc.toLowerCase();
+    const cieLow=cie.toLowerCase();
+    if(EXCLUIR.some(ex=>descLow.includes(ex)||cieLow.includes(ex))) return;
+    if(cieLow.startsWith('z')) return;
+    const nombre=resolverECNT(cie)||desc||cie;
+    const tipoDxN=r['Tipo de diagnóstico']||'';
+    if(!dxList.find(function(d){return d.cie===cie;})) dxList.push({cie:cie,nombre:nombre,tipo:tipoDxN});
+  });
+  return dxList;
+}
+
+function aptBadgeHTML(aptRaw){
+  const apt=(aptRaw||'').trim().toUpperCase();
+  const MAP={
+    'APTO':                  {bg:'#e6f9ee',c:'#15692a',brd:'#b7e4c7',lbl:'✔ APTO'},
+    'APTO EN OBSERVACIÓN':   {bg:'#fff8e1',c:'#856404',brd:'#ffd666',lbl:'👁 EN OBSERVACIÓN'},
+    'APTO CON LIMITACIONES': {bg:'#fff0e6',c:'#924e00',brd:'#ffb380',lbl:'⚠ CON LIMITACIONES'},
+    'NO APTO':               {bg:'#fdecea',c:'#8b1a1a',brd:'#f5b8b8',lbl:'✘ NO APTO'},
+  };
+  const s=MAP[apt]||{bg:'#f0f4f8',c:'#5a7a9a',brd:'#c8d8e8',lbl:aptRaw||'—'};
+  return `<span style="display:inline-block;padding:4px 11px;border-radius:5px;font-size:10px;font-weight:700;background:${s.bg};color:${s.c};border:1px solid ${s.brd};white-space:nowrap">${s.lbl}</span>`;
+}
+
+function gpBadgesHTML(gpStr){
+  if(!gpStr||gpStr==='Ninguno') return '<span style="color:#ccc;font-size:11px">—</span>';
+  const MAP={'Embarazada':{ic:'🤰',c:'#9b2335'},'Discapacidad':{ic:'♿',c:'#15508a'},'Enf.Catastrófica':{ic:'🔴',c:'#7a0000'},'Adulto Mayor':{ic:'👴',c:'#5a3a00'},'Catastrófica':{ic:'🔴',c:'#7a0000'}};
+  return gpStr.split(',').map(g=>{
+    g=g.trim(); if(!g||g==='Ninguno') return '';
+    const m=Object.entries(MAP).find(([k])=>g.includes(k));
+    const {ic,c}=m?m[1]:{ic:'●',c:'#888'};
+    return `<span style="display:inline-block;margin:2px 3px 2px 0;padding:2px 8px;border-radius:4px;background:${c}15;color:${c};font-size:10px;font-weight:700;border:1px solid ${c}33;white-space:nowrap">${ic} ${g}</span>`;
+  }).join('');
+}
+
+
+// ── ECNT — mapa de códigos CIE-10 a nombres de enfermedades ──────────
+var ECNT_DEFAULT = {
+  'E78':'Dislipidemia','E66':'Obesidad','E79':'Hiperuricemia',
+  'R74':'Enzimas hepáticas ↑','D64':'Anemia crónica','D50':'Anemia ferropénica',
+  'D51':'Anemia B12','R73':'Prediabetes','E10':'Diabetes tipo 1',
+  'E11':'Diabetes tipo 2','E14':'Diabetes','I10':'HTA esencial',
+  'I11':'HTA con cardiopatía','I15':'HTA secundaria','E03':'Hipotiroidismo',
+  'E05':'Hipertiroidismo','M41':'Escoliosis','M54':'Dorsalgia crónica',
+  'H90':'Hipoacusia','H91':'Hipoacusia','B82':'Parasitosis','B80':'Oxiuriasis',
+  'J45':'Asma','N18':'Enf. renal crónica','K21':'ERGE','K74':'Cirrosis',
+  'F32':'Depresión','F41':'Ansiedad','M05':'Artritis reumatoide',
+  'J44':'EPOC','I25':'Cardiopatía isquémica','I50':'Insuf. cardíaca',
+  'J02':'Faringitis','N39':'ITU','M47':'Espondiloartrosis','R80':'Proteinuria',
+  'S67':'Lesión por aplastamiento','E09':'Diabetes inducida','E13':'Diabetes'
+};
+
+function getECNTMap(){
+  try{
+    var s=localStorage.getItem('femo_ecnt_config');
+    return s ? JSON.parse(s) : JSON.parse(JSON.stringify(ECNT_DEFAULT));
+  }catch(e){ return JSON.parse(JSON.stringify(ECNT_DEFAULT)); }
+}
+
+function resolverECNT(cie){
+  var map = getECNTMap();
+  var c = (cie||'').trim().toUpperCase();
+  // Buscar coincidencia exacta primero
+  if(map[c]) return map[c];
+  // Luego por prefijo (E78.0 → E78)
+  for(var l=c.length-1;l>=1;l--){
+    var prefix=c.substring(0,l);
+    if(map[prefix]) return map[prefix];
+  }
+  return null;
+}
+
+function renderMatriz(){
+  // Persistir en localStorage
+  try{ localStorage.setItem('femo_matrizData', JSON.stringify(matrizData)); }catch(e){}
+  if(matEmpresa) try{ localStorage.setItem('femo_matrizEmpresa', matEmpresa); }catch(e){}
+
+  const tbody = document.getElementById('mat-tbody');
+  const cntEl = document.getElementById('mat-count');
+  const timeEl= document.getElementById('mat-time');
+
+  if(cntEl) cntEl.textContent = matrizData.length+' evaluado'+(matrizData.length!==1?'s':'');
+  if(timeEl) timeEl.textContent = 'Última carga: '+new Date().toLocaleTimeString('es-EC');
+
+  if(!tbody) return;
+
+  if(!matrizData.length){
+    tbody.innerHTML = '<tr><td colspan="14" style="text-align:center;padding:40px;color:#bbb">'
+      +'<div style="font-size:32px;margin-bottom:8px">📋</div>'
+      +'<div style="font-size:12px;font-weight:600;color:#888">La matriz está vacía</div>'
+      +'<div style="font-size:11px;color:#aaa;margin-top:4px">Usa ➕ Nueva fila para ingresar datos manualmente</div>'
+      +'</td></tr>';
+    return;
+  }
+
+  const APT_COL = {
+    'APTO':                  'background:#e6f9ee;color:#15692a;border:1px solid #b7e4c7',
+    'APTO EN OBSERVACIÓN':   'background:#fff8e1;color:#856404;border:1px solid #ffd666',
+    'APTO CON LIMITACIONES': 'background:#fff0e6;color:#924e00;border:1px solid #ffb380',
+    'NO APTO':               'background:#fdecea;color:#8b1a1a;border:1px solid #f5b8b8',
+  };
+  const TIPO_COL = {
+    'Enfermedad general':               'background:#e8f0fb;color:#1556a0',
+    'Enfermedad crónica no transmisible':'background:#f3e8ff;color:#6d28d9',
+    'Enfermedad catastrófica':          'background:#fdecea;color:#8b1a1a',
+  };
+  const GV_COL = {
+    'Embarazada':               '#e91e63',
+    'Persona con Discapacidad': '#1556a0',
+    'Enfermedad Catastrófica':  '#e74c3c',
+    'Adulto Mayor (>65)':       '#f39c12',
+  };
+  const EXCL = ['z00','examen medico','examen ocupacional','examen general','evaluacion medica','medico general','medico ocupacional'];
+
+  let html_rows = '';
+  try {
+  for(let i=0;i<matrizData.length;i++){
+    const r   = matrizData[i];
+    const rid = r['_id'];
+    const nom = r['NOMBRE COMPLETO']||'—';
+    const ced = r['N.° de historia clínica']||'—';
+    const eda = r['EDAD (años)']||'—';
+    const fi  = r['Fecha de ingreso']||'';
+    const anios = calcAnios(fi);
+    const cargo = r['Puesto / cargo (CIUO)']||'—';
+    const fe  = r['Fecha de atención']||'';
+    const feStr = fe ? fe.substring(0,10) : '—';
+    const apt = (r['Aptitud']||'').trim();
+    const aptStyle = APT_COL[apt.toUpperCase()]||'background:#f0f4f8;color:#5a7a9a;border:1px solid #d0dcea';
+    const aptLbl  = apt||'—';
+
+    // Grupo vulnerabilidad
+    const gv = (r['GRUPO AT. PRIORITARIA']||'').trim();
+    let gvHTML = '';
+    if(!gv||gv==='NO'||gv==='Ninguno'){
+      gvHTML = '<span style="color:#27ae60;font-size:10px;font-weight:600">NO</span>';
+    } else {
+      const gvcol = Object.entries(GV_COL).find(function(e){return gv.indexOf(e[0])>=0;});
+      const c = gvcol ? gvcol[1] : '#888';
+      gvHTML = '<span style="display:inline-block;padding:2px 6px;border-radius:3px;font-size:9px;font-weight:700;background:'+c+'15;color:'+c+';border:1px solid '+c+'33;white-space:nowrap">'+gv+'</span>';
+    }
+
+    // Tipo DX global (campo general) + diagnósticos individuales
+    const tipoDxGlobal = r['Tipo de diagnóstico']||'';
+
+    // Recopilar diagnósticos — solo descripción, sin CIE-10
+    let dxHTML = '';
+    let hayDx = false;
+    for(let n=1;n<=6;n++){
+      const desc = (r['DESCRIPCIÓN DX'+n]||'').trim();
+      if(!desc) continue;
+      const dl = desc.toLowerCase();
+      if(EXCL.some(function(ex){return dl.indexOf(ex)>=0;})) continue;
+      const tipoDxN = r['Tipo Dx'+n]||tipoDxGlobal||'Enfermedad general';
+      const tc = TIPO_COL[tipoDxN]||'background:#ede9fe;color:#5b21b6';
+      dxHTML += '<span style="display:inline-block;margin:1px 2px;padding:2px 7px;border-radius:3px;font-size:9px;font-weight:700;'+tc+';white-space:nowrap" title="'+tipoDxN+'">'+desc+'</span>';
+      hayDx = true;
+    }
+    if(!hayDx){
+      dxHTML = '<span style="color:#27ae60;font-size:10px;font-weight:600;background:#e8f8ef;padding:2px 8px;border-radius:4px;border:1px solid #b7e4c7">✔ Paciente sano</span>';
+    }
+
+    // Tipo Dx badge global
+    const tdc = TIPO_COL[tipoDxGlobal]||null;
+    const tipoDxHTML = tdc
+      ? '<span style="display:inline-block;padding:3px 7px;border-radius:4px;font-size:9px;font-weight:700;'+tdc+';white-space:nowrap">'+tipoDxGlobal+'</span>'
+      : '<span style="color:#ccc;font-size:10px">—</span>';
+
+    // Botones de acción — siempre visibles
+    const ridStr = String(rid);
+    const nomEsc = encodeURIComponent(nom);
+    const esLocal = ridStr.startsWith('local-');
+    const btns = '<button style="background:#1556a0;color:#fff;border:none;border-radius:5px;padding:5px 11px;cursor:pointer;font-size:11px;font-weight:700;margin-bottom:4px;display:block;width:100%" data-edit="'+ridStr+'">✏️ Editar</button>'
+               + '<button style="background:#fff;color:#c0392b;border:1.5px solid #e8b4b4;border-radius:5px;padding:5px 11px;cursor:pointer;font-size:11px;font-weight:700;display:block;width:100%'+(esLocal?';opacity:.5':'')+'" data-del="'+ridStr+'" data-nom="'+nomEsc+'">🗑 Eliminar</button>';
+
+    const bg = i%2===0?'#ffffff':'#f8fafd';
+        html_rows += '<tr style="background:'+bg+'">'       +'<td style="padding:8px;border-bottom:1px solid #e8eef8;text-align:center;font-size:11px;font-weight:700;color:#9aabbc">'+(i+1)+'</td>'
+      +'<td style="padding:8px;border-bottom:1px solid #e8eef8;font-size:10px;color:#5a7a9a;font-family:monospace">'+ced+'</td>'
+      +'<td style="padding:8px 10px;border-bottom:1px solid #e8eef8;font-weight:700;font-size:12px;color:#1a2a3a;min-width:150px">'+nom+'</td>'
+      +'<td style="padding:8px;border-bottom:1px solid #e8eef8;text-align:center;font-size:15px;font-weight:700;color:#1556a0">'+eda+'</td>'
+      +'<td style="padding:8px;border-bottom:1px solid #e8eef8;text-align:center;font-size:10px;color:#5a7a9a">'+(fi?fi.substring(0,10):'—')+'</td>'
+      +'<td style="padding:8px;border-bottom:1px solid #e8eef8;text-align:center;font-size:14px;font-weight:700;color:#1556a0">'+(anios?anios+' a':'—')+'</td>'
+      +'<td style="padding:8px 10px;border-bottom:1px solid #e8eef8;font-size:11px;font-weight:600;color:#1a2a3a">'+cargo+'</td>'
+      +'<td style="padding:8px;border-bottom:1px solid #e8eef8;text-align:center">'+gvHTML+'</td>'
+      +'<td style="padding:8px;border-bottom:1px solid #e8eef8;text-align:center;font-size:10px;color:#5a7a9a">'+feStr+'</td>'
+      +(function(){
+          var tv=r['Tipo de evaluación']||r['tipoEvaluacion']||'';
+          var TCOL={'Ingreso':'background:#e8f8ef;color:#15692a','Periódico':'background:#e8f0fb;color:#1556a0','Reintegro':'background:#fff8e1;color:#856404','Egreso/Retiro':'background:#fdecea;color:#8b1a1a','Retiro':'background:#fdecea;color:#8b1a1a'};
+          var tc=TCOL[tv]||'background:#f0f4f8;color:#5a7a9a';
+          return tv?'<td style="padding:8px;border-bottom:1px solid #e8eef8;text-align:center"><span style="display:inline-block;padding:3px 8px;border-radius:4px;font-size:9px;font-weight:700;'+tc+';white-space:nowrap">'+tv+'</span></td>':'<td style="padding:8px;border-bottom:1px solid #e8eef8;text-align:center;color:#ccc;font-size:10px">—</td>';
+        })()
+      +'<td style="padding:8px;border-bottom:1px solid #e8eef8;text-align:center"><span style="display:inline-block;padding:3px 9px;border-radius:5px;font-size:9px;font-weight:700;'+aptStyle+';white-space:nowrap">'+aptLbl+'</span></td>'
+      +'<td style="padding:8px 10px;border-bottom:1px solid #e8eef8">'+dxHTML+'</td>'
+      // Ciudad
+      +(function(){
+        var ciudad = r['Ciudad']||'';
+        if(!ciudad||ciudad==='— No especificada —'){
+          return '<td style="padding:8px;border-bottom:1px solid #e8eef8;text-align:center;font-size:10px;color:#bbb">—</td>';
+        }
+        var cCol = ciudad==='GUAYAQUIL'?'#1556a0':ciudad==='QUITO'?'#0a7a5a':'#888';
+        return '<td style="padding:8px;border-bottom:1px solid #e8eef8;text-align:center">'
+          +'<span style="display:inline-block;padding:2px 7px;border-radius:4px;font-size:9px;font-weight:700;background:'+cCol+'18;color:'+cCol+';border:1px solid '+cCol+'44;white-space:nowrap">'+ciudad+'</span>'
+          +'</td>';
+      })()
+      // Dashboard toggle
+      +(function(){
+        var incl = r['_dashIncluir'];
+        var esSI = (incl===undefined||incl==='SI');
+        return '<td style="padding:8px;border-bottom:1px solid #e8eef8;text-align:center">'
+          +'<button data-toggle="'+String(rid)+'" title="Clic para cambiar" '
+          +'style="font-size:10px;font-weight:800;padding:3px 10px;border-radius:5px;border:none;cursor:pointer;white-space:nowrap;'
+          +(esSI?'background:#e6f9ee;color:#15692a;border:1px solid #b7e4c7':'background:#fdecea;color:#8b1a1a;border:1px solid #f5b8b8')+'">'+
+          (esSI?'\u2714 SI':'\u2718 NO')+'</button>'
+          +'</td>';
+      })()
+      +'<td style="padding:8px;border-bottom:1px solid #e8eef8;text-align:center;white-space:nowrap">'+btns+'</td>'
+      +'</tr>';
+  }
+
+  tbody.innerHTML = html_rows;
+  // Listener para botones de editar/eliminar via data attributes
+  tbody.removeEventListener('click', tbody._matrizClick||function(){});
+  tbody._matrizClick = function(e){
+    var editBtn   = e.target.closest('[data-edit]');
+    var delBtn    = e.target.closest('[data-del]');
+    var toggleBtn = e.target.closest('[data-toggle]');
+    if(editBtn)    abrirEdicion(editBtn.dataset.edit);
+    if(delBtn)     confirmarEliminar(delBtn.dataset.del, decodeURIComponent(delBtn.dataset.nom||''));
+    if(toggleBtn){
+      var rid = String(toggleBtn.dataset.toggle);
+      var rec = matrizData.find(function(r){ return String(r._id)===rid; });
+      if(rec){
+        var actual = rec['_dashIncluir'];
+        rec['_dashIncluir'] = (actual===undefined||actual==='SI') ? 'NO' : 'SI';
+        try{ localStorage.setItem('femo_matrizData', JSON.stringify(matrizData)); }catch(e){}
+        renderMatriz();
+      }
+    }
+  };
+  tbody.addEventListener('click', tbody._matrizClick);
+  // Wire up edit/delete buttons via event delegation
+  tbody.addEventListener('click', function(e){
+    const editBtn = e.target.closest('[data-edit]');
+    const delBtn  = e.target.closest('[data-del]');
+    if(editBtn) abrirEdicion(editBtn.dataset.edit);
+    if(delBtn)  confirmarEliminar(delBtn.dataset.del, decodeURIComponent(delBtn.dataset.nom||''));
+  });
+  } catch(rowErr) {
+    console.error('renderMatriz row error:', rowErr);
+    if(tbody) tbody.innerHTML = '<tr><td colspan=13 style="text-align:center;padding:20px;color:#c0392b">Error al renderizar fila: '+rowErr.message+'</td></tr>';
+  }
+}
+
+
+function _buildEditForm(rec){
+  var esc=function(v){return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');};
+  var TIPO_OPTS=['— No aplica —','Enfermedad general','Enfermedad crónica no transmisible','Enfermedad catastrófica'];
+  var aptOpts=['APTO','APTO EN OBSERVACIÓN','APTO CON LIMITACIONES','NO APTO'];
+  var gvOpts=['NO','Embarazada','Persona con Discapacidad','Enfermedad Catastrófica','Adulto Mayor (>65)'];
+
+  // helper: field wrapper
+  var fw=function(lbl,inp,full){
+    return '<div style="'+(full?'grid-column:span 2;':'')+'"><div class="fld"><label style="font-size:10px;font-weight:700;color:#5a7a9a;display:block;margin-bottom:3px;text-transform:uppercase">'+lbl+'</label>'+inp+'</div></div>';
+  };
+  var inp=function(key,ph,type){
+    type=type||'text';
+    return '<input type="'+type+'" data-key="'+key+'" value="'+esc(rec[key]||'')+'" class="erec-inp" placeholder="'+(ph||'')+'" style="font-size:12px;border:1.5px solid #c8d8e8;border-radius:5px;padding:6px 9px;width:100%;box-sizing:border-box">';
+  };
+  var sel=function(key,opts){
+    var cur=rec[key]||opts[0];
+    var html='<select data-key="'+key+'" class="erec-sel" style="font-size:12px;border:1.5px solid #c8d8e8;border-radius:5px;padding:6px 9px;width:100%">';
+    opts.forEach(function(o){html+='<option'+(cur===o?' selected':'')+'>'+o+'</option>';});
+    html+='</select>';
+    return html;
+  };
+  var sep=function(t){
+    return '<div style="grid-column:span 2;margin:8px 0 2px;padding:5px 0;border-top:1.5px solid #e8eef8;font-size:10px;font-weight:700;color:#1556a0;text-transform:uppercase;letter-spacing:.05em">'+t+'</div>';
+  };
+
+  var h='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+
+  // ── Identificación ──
+  // ── Ciudad y Dashboard ──
+  h+=sep('📍 Sede / Dashboard');
+  var dashOpts=['SI','NO'];
+  h+=fw('Ciudad / Sede', inp('Ciudad','ej. Guayaquil, Quito, Cuenca...'));
+  h+=fw('Incluir en Dashboard',
+    '<div style="display:flex;gap:8px;align-items:center;margin-top:2px">'
+    +dashOpts.map(function(o){
+      var activo=(rec['_dashIncluir']===undefined?o==='SI':rec['_dashIncluir']===o);
+      return '<label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px;font-weight:700">'
+        +'<input type="radio" name="dashIncluir" value="'+o+'" '+(activo?'checked':'')+' '
+        +'onchange="if(editingRecord){editingRecord[\'_dashIncluir\']=this.value;}" '
+        +'style="accent-color:'+(o==='SI'?'#27ae60':'#e74c3c')+';width:14px;height:14px">'
+        +'<span style="color:'+(o==='SI'?'#15692a':'#8b1a1a')+'">'+o+'</span>'
+        +'</label>';
+    }).join('')
+    +'</div>'
+  );
+
+  h+=sep('🪪 Identificación');
+  h+=fw('Cédula / N° Historia Clínica',
+    '<div style="display:flex;gap:6px">'
+    +'<input type="text" id="edit-cedula-inp" data-key="N.° de historia clínica" value="'+esc(rec['N.° de historia clínica']||'')+'" class="erec-inp" placeholder="Ingresa cédula" style="flex:1;font-size:12px;border:1.5px solid #c8d8e8;border-radius:5px;padding:6px 9px;box-sizing:border-box">'
+    +'<button type="button" onclick="buscarFichaPorCedula()" style="background:#1556a0;color:#fff;border:none;border-radius:5px;padding:6px 12px;cursor:pointer;font-size:11px;font-weight:700;white-space:nowrap">🔍 Cargar ficha</button>'
+    +'</div>', true);
+  h+=fw('Nombres y Apellidos', inp('NOMBRE COMPLETO','Apellidos y nombres completos'), true);
+
+  // ── Datos laborales ──
+  h+=sep('📋 Datos laborales');
+  h+=fw('Edad (años)', inp('EDAD (años)','Edad','number'));
+  h+=fw('Cargo / Puesto', inp('Puesto / cargo (CIUO)','Cargo que desempeña'));
+  var tipoEvalOpts=['Ingreso','Periódico','Reintegro','Egreso/Retiro'];
+  h+=fw('Tipo de Evaluación', sel('Tipo de evaluación', tipoEvalOpts));
+  h+=fw('Grupo Sanguíneo', inp('GRUPO SANGUÍNEO','ej. O+, A-, AB+'));
+  h+=fw('IMC (kg/m²)', inp('IMC (kg/m²)','ej. 26.3'));
+  h+=fw('Fecha de Ingreso Laboral',
+    '<input type="date" data-key="Fecha de ingreso" id="edit-fecha-ingreso" value="'+esc(rec['Fecha de ingreso']||'')+'" class="erec-inp" style="font-size:12px;border:1.5px solid #c8d8e8;border-radius:5px;padding:6px 9px;width:100%;box-sizing:border-box">');
+  var aniosVal=calcAnios(rec['Fecha de ingreso']||'');
+  h+=fw('Años Laborando',
+    '<input type="text" id="anios-lab-display" value="'+(aniosVal?aniosVal+' años':'')+'" readonly style="font-size:14px;font-weight:700;color:#1556a0;border:1.5px solid #e0e8f0;border-radius:5px;padding:6px 9px;width:100%;box-sizing:border-box;background:#f0f6ff">');
+
+  // ── Vulnerabilidad + Aptitud ──
+  h+=sep('⚠️ Grupo de vulnerabilidad y Aptitud');
+  h+=fw('Grupo de Vulnerabilidad', sel('GRUPO AT. PRIORITARIA', gvOpts));
+  h+=fw('Aptitud Médica Laboral', sel('Aptitud', aptOpts));
+
+  // ── Diagnósticos simplificados ──
+  h+=sep('🔬 Diagnósticos');
+  h+='<div style="grid-column:span 2;font-size:11px;color:#6a8aaa;margin-bottom:4px">Ingresa el nombre del diagnóstico y su tipo.</div>';
+
+  window._dxVisible = window._dxVisible||2;
+  var dxCount=0;
+  for(var n=1;n<=6;n++){ if((rec['DESCRIPCIÓN DX'+n]||'').trim()) dxCount=n; }
+  window._dxVisible=Math.max(window._dxVisible, Math.max(2,dxCount));
+
+  for(var n=1;n<=window._dxVisible;n++){
+    var kd='DESCRIPCIÓN DX'+n;
+    var kt='Tipo Dx'+n;
+    var vt=rec[kt]||'— No aplica —';
+    h+='<div style="grid-column:span 2;background:#f8faff;border:1px solid #e0e8f0;border-radius:6px;padding:9px;margin-bottom:4px">';
+    h+='<div style="display:grid;grid-template-columns:1fr 200px;gap:6px;align-items:end">';
+    // Diagnóstico
+    h+='<div class="fld"><label style="font-size:9px;font-weight:700;color:#5a7a9a;display:block;margin-bottom:2px;text-transform:uppercase">Diagnóstico '+n+'</label>'
+      +'<input type="text" data-key="'+kd+'" value="'+esc(rec[kd]||'')+'" class="erec-inp" placeholder="Nombre del diagnóstico" '
+      +'style="font-size:12px;border:1.5px solid #c8d8e8;border-radius:5px;padding:5px 8px;width:100%;box-sizing:border-box"></div>';
+    // Tipo
+    h+='<div class="fld"><label style="font-size:9px;font-weight:700;color:#5a7a9a;display:block;margin-bottom:2px;text-transform:uppercase">Tipo</label>'
+      +'<select data-key="'+kt+'" class="erec-sel" style="font-size:11px;border:1.5px solid #c8d8e8;border-radius:5px;padding:5px 7px;width:100%">'
+      +TIPO_OPTS.map(function(o){return '<option'+(vt===o?' selected':'')+'>'+o+'</option>';}).join('')
+      +'</select></div>';
+    h+='</div></div>';
+  }
+
+  if(window._dxVisible<6){
+    h+='<div style="grid-column:span 2">'
+      +'<button type="button" onclick="addDxField()" style="background:#fff;color:#1556a0;border:1.5px solid #1556a0;border-radius:5px;padding:5px 14px;cursor:pointer;font-size:11px;font-weight:700">+ Agregar diagnóstico</button>'
+      +'</div>';
+  }
+
+  h+='</div>';
+  return h;
+}
+
+function addDxField(){
+  if(window._dxVisible>=6) return;
+  window._dxVisible=(window._dxVisible||2)+1;
+  if(editingRecord){
+    document.getElementById('modal-form').innerHTML=_buildEditForm(editingRecord);
+    wireModalInputs();
+  }
+}
+
+
+function abrirEdicion(rid){
+  rid = String(rid);
+  const rec = matrizData.find(function(r){ return String(r._id)===rid; });
+  if(!rec){ console.warn('abrirEdicion: no encontrado rid=',rid); return; }
+  editingRecord = JSON.parse(JSON.stringify(rec));
+  window._dxVisible = 2;
+  document.getElementById('modal-form').innerHTML = _buildEditForm(editingRecord);
+  document.getElementById('modal-edit').style.display = 'block';
+  wireModalInputs();
+  // Wire fecha ingreso → años laborando
+  var fi = document.getElementById('edit-fecha-ingreso');
+  if(fi) fi.addEventListener('input', function(){
+    editingRecord['Fecha de ingreso']=this.value;
+    var el=document.getElementById('anios-lab-display');
+    var a=calcAnios(this.value);
+    if(el) el.value=a?a+' años':'';
+  });
+}
+
+function cerrarModal(){
+  document.getElementById('modal-edit').style.display='none';
+  editingRecord = null;
+  window._dxVisible = 2;
+}
+
+async function guardarEdicion(){
+  if(!editingRecord) return;
+  // Read ALL inputs from modal (in case oninput missed something)
+  document.querySelectorAll('#modal-form .erec-inp, #modal-form .erec-sel').forEach(function(el){
+    if(el.dataset.key && editingRecord) editingRecord[el.dataset.key] = el.value;
+  });
+  // Capturar radio Dashboard SI/NO
+  var dashRadio = document.querySelector('#modal-form input[name="dashIncluir"]:checked');
+  if(dashRadio && editingRecord) editingRecord['_dashIncluir'] = dashRadio.value;
+  // Also read cedula
+  var cedInp = document.getElementById('edit-cedula-inp');
+  if(cedInp && editingRecord) editingRecord['N.° de historia clínica'] = cedInp.value;
+
+  var payload = JSON.parse(JSON.stringify(editingRecord));
+  var nom = payload['NOMBRE COMPLETO']||'Registro';
+  var isLocal = String(payload._id||'').startsWith('local-') || !payload._id;
+
+  if(!isLocal){
+    // UPDATE existing Supabase record
+    try{
+      var r=await fetch('/api/matriz/editar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+      var d=await r.json();
+      if(!d.ok) throw new Error(d.error||'Error');
+      // Update local copy
+      var idx=matrizData.findIndex(function(r){return String(r._id)===String(payload._id);});
+      if(idx>=0) matrizData[idx]=payload;
+      try{localStorage.setItem('femo_matrizData',JSON.stringify(matrizData));}catch(e){}
+      showMsg('✓ '+nom+' actualizado');
+      cerrarModal();
+      renderMatriz();
+    }catch(e){ alert('Error al actualizar: '+e.message); }
+  } else {
+    // NEW record — show immediately
+    payload._id = 'local-'+Date.now();
+    payload['N°'] = matrizData.length+1;
+    var ced = payload['N.° de historia clínica']||'';
+    var existing = matrizData.findIndex(function(r){return r['N.° de historia clínica']===ced&&ced;});
+    if(existing>=0){ matrizData[existing]=payload; }
+    else { matrizData.push(payload); }
+    try{localStorage.setItem('femo_matrizData',JSON.stringify(matrizData));}catch(e){}
+    renderMatriz();
+    cerrarModal();
+    showMsg('✓ '+nom+' añadido a la matriz');
+    // Save to Supabase in background
+    (async function(){
+      try{
+        var body=JSON.parse(JSON.stringify(payload));
+        delete body._id;
+        var r2=await fetch('/api/matriz/nuevo',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+        var d2=await r2.json();
+        if(d2.ok){
+          var r3=await fetch('/api/matriz/lista');
+          var lista=await r3.json();
+          if(Array.isArray(lista)&&lista.length>0){
+            matrizData=lista;
+            try{localStorage.setItem('femo_matrizData',JSON.stringify(matrizData));}catch(e){}
+            renderMatriz();
+          }
+        }
+      }catch(ex){ console.warn('Supabase bg save:',ex.message); }
+    })();
+  }
+}
+
+function matAgregarFila(){
+  const fila={'_id':null,'NOMBRE COMPLETO':'','EDAD (años)':'','Fecha de ingreso':'',
+    'Puesto / cargo (CIUO)':'','Fecha de atención':'','Aptitud':'',
+    'DIAGNÓSTICO 1 CIE-10':'','DESCRIPCIÓN DX1':'',
+    'Empresa / institución':matEmpresa,'N°':matrizData.length+1};
+  editingRecord=fila;
+  document.getElementById('modal-form').innerHTML=_buildEditForm(fila);
+  document.getElementById('modal-edit').style.display='block';
+  wireModalInputs();
+}
+
+function renderEstadisticas(){}
+function actualizarProgreso2(){ actualizarProgreso(); }
+
+
+// ── BUSCAR FICHA POR CÉDULA — auto-llena el modal desde borrador ──
+async function buscarFichaPorCedula(){
+  const inp = document.getElementById('edit-cedula-inp');
+  const cedula = (inp?.value||'').trim();
+  if(!cedula){ alert('Ingresa la cédula primero.'); return; }
+  const btn = inp.nextElementSibling;
+  if(btn){ btn.disabled=true; btn.textContent='⏳ Buscando...'; }
+  try{
+    const r = await fetch('/api/borrador/'+encodeURIComponent(cedula));
+    const d = await r.json();
+    if(!d.ok || !d.data){
+      if(btn){ btn.disabled=false; btn.textContent='🔍 Cargar ficha'; }
+      alert('No se encontró ninguna ficha guardada para la cédula: '+cedula+'\n\nAsegúrate de haber guardado el borrador desde el formulario.');
+      return;
+    }
+    // Mapear los datos del borrador al editingRecord
+    const fd = d.data;
+    const APTMAP={'APTO':'APTO','APTO_OBS':'APTO EN OBSERVACIÓN','APTO_LIM':'APTO CON LIMITACIONES','NO_APTO':'NO APTO'};
+    const nom = [fd.primerApellido||'',fd.segundoApellido||'',fd.primerNombre||'',fd.segundoNombre||''].filter(Boolean).join(' ').trim();
+    editingRecord['N.° de historia clínica'] = cedula;
+    editingRecord['NOMBRE COMPLETO']         = nom;
+    editingRecord['SEXO']                    = fd.sexo||'';
+    editingRecord['EDAD (años)']             = fd.edad||'';
+    editingRecord['FECHA NACIMIENTO']        = fd.fechaNacimiento||'';
+    editingRecord['GRUPO SANGUÍNEO']         = fd.grupoSanguineo||'';
+    editingRecord['Empresa / institución']   = fd.institucion||fd.establecimiento||'';
+    editingRecord['Puesto / cargo (CIUO)']   = fd.puestoCIUO||'';
+    editingRecord['Tipo de evaluación']      = fd.tipoEvaluacion||'';
+    editingRecord['Fecha de atención']       = fd.fechaAtencion||'';
+    editingRecord['Fecha de ingreso']        = fd.fechaIngreso||'';
+    editingRecord['Temperatura (°C)']        = fd.temperatura||'';
+    editingRecord['Presión arterial']        = fd.pa||'';
+    editingRecord['FC (lat/min)']            = fd.fc||'';
+    editingRecord['FR (fr/min)']             = fd.fr||'';
+    editingRecord['SpO₂ (%)']               = fd.spo2||'';
+    editingRecord['Peso (kg)']              = fd.peso||'';
+    editingRecord['Talla (cm)']             = fd.talla||'';
+    editingRecord['IMC (kg/m²)']            = fd.imc||'';
+    editingRecord['Perímetro abdominal (cm)']= fd.perAbdominal||'';
+    editingRecord['Aptitud']                 = APTMAP[fd.aptitud||'']||fd.aptitud||'';
+    editingRecord['Observaciones de aptitud']= fd.aptitudObs||'';
+    editingRecord['Recomendaciones']         = fd.recomendaciones||'';
+    editingRecord['Médico responsable']      = fd.nombreProf||'';
+    // Grupos prioritarios
+    const gps=[];
+    if(fd.embarazada) gps.push('Embarazada');
+    if(fd.discapacidad) gps.push('Discapacidad');
+    if(fd.enfCatastrofica) gps.push('Enf.Catastrófica');
+    if(fd.adultoMayor) gps.push('Adulto Mayor');
+    editingRecord['GRUPO AT. PRIORITARIA'] = gps.join(', ')||'Ninguno';
+    // Diagnósticos — mapear todos los del borrador (hasta 6)
+    const dxs = fd.diagnosticos||[];
+    let dxCargados = 0;
+    for(let n=0;n<6;n++){
+      const dx=dxs[n]||{};
+      const cie  = (dx.cie10||'').trim();
+      const desc = (dx.desc||'').trim();
+      editingRecord['DIAGNÓSTICO '+(n+1)+' CIE-10'] = cie;
+      editingRecord['DESCRIPCIÓN DX'+(n+1)]          = desc;
+      editingRecord['Tipo Dx'+(n+1)]                 = dx.tipoDx||'';
+      // Clasificar automáticamente por CIE-10 si no tiene tipo asignado
+      if(cie && !dx.tipoDx){
+        var ecntName = resolverECNT(cie);
+        if(ecntName){
+          editingRecord['Tipo Dx'+(n+1)] = 'Enfermedad crónica no transmisible';
+        } else if(cie.toUpperCase().startsWith('Z00')){
+          editingRecord['Tipo Dx'+(n+1)] = '— No aplica —';
+        } else {
+          editingRecord['Tipo Dx'+(n+1)] = 'Enfermedad general';
+        }
+      }
+      if(cie||desc) dxCargados = n+1;
+    }
+    // Mostrar tantos campos como diagnósticos tenga el borrador (mínimo 2)
+    window._dxVisible = Math.max(2, dxCargados);
+
+    // Reconstruir formulario con todos los datos
+    document.getElementById('modal-form').innerHTML = _buildEditForm(editingRecord);
+    wireModalInputs();
+    // Actualizar fecha ingreso → años
+    var fi=document.getElementById('edit-fecha-ingreso');
+    if(fi) fi.addEventListener('input',function(){
+      editingRecord['Fecha de ingreso']=this.value;
+      var el=document.getElementById('anios-lab-display');
+      var a=calcAnios(this.value);
+      if(el) el.value=a?a+' años':'';
+    });
+    showMsg('✓ Ficha de '+nom+' cargada con '+dxCargados+' diagnóstico'+(dxCargados!==1?'s':'')+'. Revisa y presiona Guardar.');
+  }catch(e){
+    alert('Error al buscar: '+e.message);
+  }
+  if(btn){ btn.disabled=false; btn.textContent='🔍 Cargar ficha'; }
+}
+
+
+// ── IMPORTAR BORRADORES A LA MATRIZ ──────────────────────────
+async function importarBorradores(){
+  const btn = event?.target;
+  if(btn){ btn.disabled=true; btn.textContent='⏳ Importando...'; }
+  try{
+    const r = await fetch('/api/importar-borradores', {method:'POST'});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const d = await r.json();
+    if(d.ok){
+      const msg = `✓ ${d.importados} fichas importadas, ${d.actualizados} actualizadas. Total en matriz: ${d.total}`;
+      showMsg(msg);
+      await cargarMatriz();
+    } else {
+      alert('Error al importar: '+(d.error||'desconocido'));
+    }
+  }catch(e){ alert('Error: '+e.message); }
+  if(btn){ btn.disabled=false; btn.textContent='⬆ Importar borradores'; }
+}
+
+
+// Wire up modal inputs (avoids template literal oninput bugs)
+function wireModalInputs(){
+  document.querySelectorAll('#modal-form .erec-inp, #modal-form .erec-sel').forEach(el=>{
+    const k=el.dataset.key;
+    if(!k) return;
+    el.addEventListener('input', ()=>{ if(editingRecord) editingRecord[k]=el.value; });
+    el.addEventListener('change', ()=>{ if(editingRecord) editingRecord[k]=el.value; });
+  });
+  // Also wire non-erec inputs
+  document.querySelectorAll('#modal-form input[oninput], #modal-form select[onchange], #modal-form textarea[oninput]').forEach(el=>{
+    // already wired via inline handlers
+  });
+}
+
+function addDxField(){
+  if(window._dxVisible>=6) return;
+  window._dxVisible = (window._dxVisible||2)+1;
+  if(editingRecord){
+    document.getElementById('modal-form').innerHTML=_buildEditForm(editingRecord);
+    wireModalInputs();
+  }
+}
+
+
+function debugMatriz(){
+  const info = {
+    matrizDataLength: matrizData.length,
+    localStorage_length: (()=>{ try{ const s=localStorage.getItem('femo_matrizData'); return s ? JSON.parse(s).length : 0; }catch(e){ return 'error'; }})(),
+    firstRecord: matrizData.length > 0 ? JSON.stringify(matrizData[0]).substring(0,200) : 'vacío',
+    dashVisible: dashVisible,
+  };
+  alert('DEBUG MATRIZ:\n' + JSON.stringify(info, null, 2));
+  console.log('matrizData:', matrizData);
+}
+
+
+function confirmarEliminar(rid, nom){
+  rid = String(rid);
+  var existing = document.getElementById('del-modal');
+  if(existing) existing.remove();
+  var m = document.createElement('div');
+  m.id = 'del-modal';
+  m.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  m.innerHTML = '<div style="background:#fff;border-radius:12px;padding:26px;max-width:400px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,.3);text-align:center">'
+    +'<div style="font-size:36px;margin-bottom:10px">🗑️</div>'
+    +'<h3 style="color:#1a2a3a;font-size:14px;margin:0 0 8px">¿Eliminar este registro?</h3>'
+    +'<p style="color:#5a7a9a;font-size:12px;margin:0 0 6px;font-weight:600">'+nom+'</p>'
+    +'<p style="color:#e74c3c;font-size:11px;margin:0 0 20px;background:#fdecea;padding:7px 12px;border-radius:5px">Esta acción no se puede deshacer.</p>'
+    +'<div style="display:flex;gap:10px;justify-content:center">'
+    +'<button id="del-cancel" style="flex:1;padding:9px 16px;border:1.5px solid #d0dcea;border-radius:6px;background:#fff;color:#5a7a9a;cursor:pointer;font-size:12px;font-weight:700">Cancelar</button>'
+    +'<button id="del-confirm" style="flex:1;padding:9px 16px;border:none;border-radius:6px;background:#c0392b;color:#fff;cursor:pointer;font-size:12px;font-weight:700">Sí, eliminar</button>'
+    +'</div></div>';
+  document.body.appendChild(m);
+  document.getElementById('del-cancel').onclick = function(){ m.remove(); };
+  document.getElementById('del-confirm').onclick = function(){ m.remove(); ejecutarEliminar(rid, nom); };
+  m.addEventListener('click', function(e){ if(e.target===m) m.remove(); });
+}
+
+async function ejecutarEliminar(rid, nom){
+  rid = String(rid);
+  // Si es local, solo eliminar del array local
+  if(rid.startsWith('local-')){
+    matrizData = matrizData.filter(function(r){ return String(r._id)!==rid; });
+    try{localStorage.setItem('femo_matrizData',JSON.stringify(matrizData));}catch(e){}
+    showMsg('🗑 Registro de '+nom+' eliminado','warn');
+    renderMatriz();
+    return;
+  }
+  try{
+    var r = await fetch('/api/matriz/eliminar/'+rid, {method:'DELETE'});
+    var d = await r.json();
+    if(d.ok){
+      showMsg('🗑 Registro de '+nom+' eliminado','warn');
+      matrizData = matrizData.filter(function(r){ return String(r._id)!==rid; });
+      try{localStorage.setItem('femo_matrizData',JSON.stringify(matrizData));}catch(e){}
+      renderMatriz();
+    } else { alert('Error: '+(d.error||'desconocido')); }
+  }catch(e){ alert('Error: '+e.message); }
+}
+
+
+// ═══════════════════════════════════════════════════════════
+//  MATRICES POR TIPO DE EVALUACIÓN
+// ═══════════════════════════════════════════════════════════
+
+// Mapeo tipo → tab id y palabras clave
+var TIPO_MAP = {
+  'ingreso':   {key:'ingreso',   palabras:['ingreso','INGRESO'],        color:'#15692a', bg:'#e8f8ef'},
+  'periodico': {key:'periodico', palabras:['periódico','periodico','PERIÓDICO','PERIODICO'], color:'#1556a0', bg:'#e8f0fb'},
+  'reintegro': {key:'reintegro', palabras:['reintegro','REINTEGRO'],    color:'#856404', bg:'#fff8e1'},
+  'egreso':    {key:'egreso',    palabras:['retiro','egreso','RETIRO','EGRESO','salida'], color:'#8b1a1a', bg:'#fdecea'},
+};
+
+function filtrarPorTipo(tipo){
+  var config = TIPO_MAP[tipo];
+  if(!config) return matrizData;
+  return matrizData.filter(function(r){
+    var tv = (r['Tipo de evaluación']||r['tipoEvaluacion']||'').toLowerCase();
+    return config.palabras.some(function(p){ return tv.indexOf(p.toLowerCase())>=0; });
+  });
+}
+
+function renderTipoTabla(tipo, lista){
+  var tbodyId = 'tbody-'+tipo;
+  var countId = 'count-'+tipo;
+  var tbody = document.getElementById(tbodyId);
+  var cntEl = document.getElementById(countId);
+  if(cntEl) cntEl.textContent = lista.length+' registro'+(lista.length!==1?'s':'');
+  if(!tbody) return;
+
+  if(!lista.length){
+    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:30px;color:#aaa">'
+      +'<div style="font-size:24px;margin-bottom:8px">📋</div>'
+      +'<div style="font-size:12px">Sin evaluaciones de este tipo aún</div></td></tr>';
+    return;
+  }
+
+  var APT_COL = {
+    'APTO':'background:#e6f9ee;color:#15692a','APTO EN OBSERVACIÓN':'background:#fff8e1;color:#856404',
+    'APTO CON LIMITACIONES':'background:#fff0e6;color:#924e00','NO APTO':'background:#fdecea;color:#8b1a1a'
+  };
+  var EXCL=['z00','examen medico','examen ocupacional','examen general','evaluacion medica'];
+
+  var rows = '';
+  lista.forEach(function(r, i){
+    var rid = String(r['_id']||'');
+    var nom = r['NOMBRE COMPLETO']||'—';
+    var ced = r['N.° de historia clínica']||'—';
+    var edad= r['EDAD (años)']||'—';
+    var fi  = r['Fecha de ingreso']||'';
+    var anios=calcAnios(fi);
+    var cargo=r['Puesto / cargo (CIUO)']||'—';
+    var fe  = r['Fecha de atención']||'';
+    var apt = (r['Aptitud']||'').trim().toUpperCase();
+    var aptStyle = APT_COL[apt]||'background:#f0f4f8;color:#5a7a9a';
+    // Diagnósticos
+    var dxList=[]; 
+    for(var n=1;n<=6;n++){
+      var cie=(r['DIAGNÓSTICO '+n+' CIE-10']||'').trim();
+      var desc=(r['DESCRIPCIÓN DX'+n]||'').trim();
+      if(!cie||cie.toUpperCase().startsWith('Z')) continue;
+      if(EXCL.some(function(ex){return desc.toLowerCase().indexOf(ex)>=0;})) continue;
+      dxList.push((resolverECNT(cie)||desc||cie));
+    }
+    var dxHTML = dxList.length
+      ? dxList.map(function(d){return '<span style="display:inline-block;margin:1px 3px;padding:2px 7px;border-radius:3px;background:#ede9fe;color:#5b21b6;font-size:9px;font-weight:700">'+d+'</span>';}).join('')
+      : '<span style="color:#27ae60;font-size:10px;font-weight:600">✔ Sano</span>';
+    var bg = i%2===0?'#fff':'#f8fafd';
+    rows += '<tr style="background:'+bg+'">'
+      +'<td style="padding:8px;border-bottom:1px solid #e8eef8;text-align:center;font-size:10px;color:#9aabbc">'+(i+1)+'</td>'
+      +'<td style="padding:8px;border-bottom:1px solid #e8eef8;font-size:10px;color:#5a7a9a;font-family:monospace">'+ced+'</td>'
+      +'<td style="padding:8px 10px;border-bottom:1px solid #e8eef8;font-weight:700;font-size:12px;min-width:150px">'+nom+'</td>'
+      +'<td style="padding:8px;border-bottom:1px solid #e8eef8;text-align:center;font-size:14px;font-weight:700;color:#1556a0">'+edad+'</td>'
+      +'<td style="padding:8px;border-bottom:1px solid #e8eef8;font-size:11px;color:#5a7a9a">'+(fi?fi.substring(0,10):'—')+'</td>'
+      +'<td style="padding:8px;border-bottom:1px solid #e8eef8;text-align:center;font-size:14px;font-weight:700;color:#1556a0">'+(anios?anios+'a':'—')+'</td>'
+      +'<td style="padding:8px 10px;border-bottom:1px solid #e8eef8;font-size:11px;font-weight:600;min-width:130px">'+cargo+'</td>'
+      +'<td style="padding:8px;border-bottom:1px solid #e8eef8;text-align:center;font-size:10px;color:#5a7a9a">'+(fe?fe.substring(0,10):'—')+'</td>'
+      +'<td style="padding:8px;border-bottom:1px solid #e8eef8;text-align:center">'
+      +'<span style="display:inline-block;padding:3px 9px;border-radius:5px;font-size:9px;font-weight:700;'+aptStyle+';white-space:nowrap">'+apt+'</span></td>'
+      +'<td style="padding:8px 10px;border-bottom:1px solid #e8eef8">'+dxHTML+'</td>'
+      +'</tr>';
+  });
+
+  // Build thead
+  var thead = '<tr style="background:linear-gradient(135deg,#0a2d5a,#1556a0)">'
+    +['#','Cédula','Nombres y Apellidos','Edad','F. Ingreso','Años','Cargo','F. Evaluación','Aptitud','Diagnósticos']
+    .map(function(h){return '<th style="padding:9px 8px;color:#fff;font-size:9px;font-weight:700;text-transform:uppercase;text-align:left;white-space:nowrap">'+h+'</th>';}).join('')
+    +'</tr>';
+  var table = document.getElementById('tabla-'+tipo);
+  if(table){
+    var existingThead = table.querySelector('thead');
+    if(existingThead) existingThead.innerHTML = thead;
+    else { var th=document.createElement('thead'); th.innerHTML=thead; table.insertBefore(th,table.firstChild); }
+  }
+  tbody.innerHTML = rows;
+}
+
+function renderTodosLosTipos(){
+  ['ingreso','periodico','reintegro','egreso'].forEach(function(tipo){
+    var lista = filtrarPorTipo(tipo);
+    renderTipoTabla(tipo, lista);
+  });
+}
+
+function showDashboardTipo(tipo){
+  // Cambiar al tab dashboard con datos filtrados por tipo
+  var lista = filtrarPorTipo(tipo);
+  var config = TIPO_MAP[tipo];
+  // Temporarily filter matrizData for dashboard
+  var originalData = matrizData;
+  matrizData = lista;
+  showDTab('dashboard');
+  matrizData = originalData;
+  // Add title to dashboard
+  var kpiDiv = document.getElementById('dash-kpis');
+  if(kpiDiv){
+    var title = document.createElement('div');
+    title.style.cssText = 'grid-column:1/-1;padding:6px 10px;background:'+config.bg+';border-radius:6px;font-size:11px;font-weight:700;color:'+config.color+';margin-bottom:4px';
+    title.textContent = 'Dashboard filtrado: Evaluaciones de '+(tipo==='periodico'?'PERIÓDICO':tipo.toUpperCase())+' ('+lista.length+' registros)';
+    kpiDiv.insertBefore(title, kpiDiv.firstChild);
+  }
+}
+
+
+// ═══════════════════════════════════════════════════════════
+//  SELECTOR DE FUENTE PARA EL DASHBOARD
+// ═══════════════════════════════════════════════════════════
+var _dashFuente = 'todos';  // fuente actual seleccionada
+
+function elegirFuenteDashboard(fuente){
+  _dashFuente = fuente;
+
+  // Estilos de los botones
+  var BTN_STYLES = {
+    'todos':    {border:'#1556a0', bg:'#1556a0',   text:'#fff'},
+    'ingreso':  {border:'#27ae60', bg:'#27ae60',   text:'#fff'},
+    'periodico':{border:'#1556a0', bg:'#1556a0',   text:'#fff'},
+    'reintegro':{border:'#856404', bg:'#856404',   text:'#fff'},
+    'egreso':   {border:'#e74c3c', bg:'#e74c3c',   text:'#fff'},
+  };
+  var BTN_STYLES_OFF = {
+    'todos':    {border:'#1556a0', bg:'#fff', text:'#1556a0'},
+    'ingreso':  {border:'#27ae60', bg:'#fff', text:'#27ae60'},
+    'periodico':{border:'#1556a0', bg:'#fff', text:'#1556a0'},
+    'reintegro':{border:'#856404', bg:'#fff', text:'#856404'},
+    'egreso':   {border:'#e74c3c', bg:'#fff', text:'#e74c3c'},
+  };
+
+  ['todos','ingreso','periodico','reintegro','egreso'].forEach(function(f){
+    var btn = document.getElementById('dash-src-'+f);
+    if(!btn) return;
+    var s = f===fuente ? BTN_STYLES[f] : BTN_STYLES_OFF[f];
+    btn.style.borderColor = s.border;
+    btn.style.background  = s.bg;
+    btn.style.color       = s.text;
+  });
+
+  // Label
+  var LABELS = {
+    'todos':    'Todos los tipos',
+    'ingreso':  'Solo Ingreso',
+    'periodico':'Solo Periódico',
+    'reintegro':'Solo Reintegro',
+    'egreso':   'Solo Egreso/Retiro',
+  };
+  var lbl = document.getElementById('dash-fuente-label');
+  if(lbl) lbl.innerHTML = 'Mostrando estadísticas de: <strong>'+LABELS[fuente]+'</strong>';
+
+  // Renderizar dashboard con datos filtrados
+  // Solo registros marcados como SI en Dashboard (por defecto todos son SI)
+  var baseActiva = matrizData.filter(function(r){ return r['_dashIncluir'] !== 'NO'; });
+  var datosFiltrados = fuente === 'todos' ? baseActiva : baseActiva.filter(function(r){
+    var t = (r['Tipo de evaluación']||'').trim();
+    var TMAP = {ingreso:'Ingreso',periodico:'Periódico',reintegro:'Reintegro',egreso:'Egreso/Retiro'};
+    return t === (TMAP[fuente]||fuente);
+  });
+  var originalData = matrizData;
+  matrizData = datosFiltrados;
+  renderDashboard();
+  matrizData = originalData;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  FILTROS DE LA MATRIZ
+// ═══════════════════════════════════════════════════════════
+function matFiltrar(){
+  var buscar  = (document.getElementById('mf-buscar') ||{value:''}).value.toLowerCase().trim();
+  var cargo   = (document.getElementById('mf-cargo')  ||{value:''}).value.toLowerCase().trim();
+  var gv      = (document.getElementById('mf-gv')     ||{value:''}).value.trim();
+  var fechaMes= (document.getElementById('mf-fecha')  ||{value:''}).value.trim(); // 'YYYY-MM'
+  var tipo    = (document.getElementById('mf-tipo')   ||{value:''}).value.trim().toLowerCase();
+  var aptitud = (document.getElementById('mf-aptitud')||{value:''}).value.trim().toUpperCase();
+  var ciudad  = (document.getElementById('mf-ciudad') ||{value:''}).value.toLowerCase().trim();
+
+  var sinFiltros = !buscar && !cargo && !gv && !fechaMes && !tipo && !aptitud && !ciudad;
+
+  var tbody = document.getElementById('mat-tbody');
+  if(!tbody) return;
+
+  if(sinFiltros){
+    // mostrar todo sin re-renderizar
+    Array.from(tbody.rows).forEach(function(tr){ tr.style.display=''; });
+    var cntEl = document.getElementById('mat-count');
+    if(cntEl) cntEl.textContent = matrizData.length+' evaluado'+(matrizData.length!==1?'s':'');
+    return;
+  }
+
+  var visibles = 0;
+  Array.from(tbody.rows).forEach(function(tr, i){
+    var r = matrizData[i];
+    if(!r){ tr.style.display='none'; return; }
+
+    var ok = true;
+
+    if(buscar){
+      var nom = (r['NOMBRE COMPLETO']||'').toLowerCase();
+      var ced = (r['N.° de historia clínica']||'').toLowerCase();
+      if(!nom.includes(buscar) && !ced.includes(buscar)) ok=false;
+    }
+    if(ok && cargo){
+      var c = (r['Puesto / cargo (CIUO)']||'').toLowerCase();
+      if(!c.includes(cargo)) ok=false;
+    }
+    if(ok && gv){
+      var g = (r['GRUPO AT. PRIORITARIA']||'NO').trim();
+      if(gv==='NO'){ if(g!=='NO'&&g!=='Ninguno'&&g!=='') ok=false; }
+      else { if(!g.includes(gv)) ok=false; }
+    }
+    if(ok && fechaMes){
+      var fe = (r['Fecha de atención']||'').substring(0,7); // 'YYYY-MM'
+      if(fe !== fechaMes) ok=false;
+    }
+    if(ok && tipo){
+      var tv = (r['Tipo de evaluación']||r['tipoEvaluacion']||'').toLowerCase().trim();
+      if(!tv.includes(tipo)) ok=false;
+    }
+    if(ok && aptitud){
+      var apt = (r['Aptitud']||'').toUpperCase().trim();
+      if(!apt.includes(aptitud)) ok=false;
+    }
+    if(ok && ciudad){
+      var cd = (r['Ciudad']||'').toLowerCase();
+      if(!cd.includes(ciudad)) ok=false;
+    }
+
+    tr.style.display = ok ? '' : 'none';
+    if(ok) visibles++;
+  });
+
+  var cntEl = document.getElementById('mat-count');
+  if(cntEl) cntEl.textContent = visibles+' / '+matrizData.length+' evaluado'+(matrizData.length!==1?'s':'');
+}
+
+function matLimpiarFiltros(){
+  ['mf-buscar','mf-cargo','mf-gv','mf-fecha','mf-tipo','mf-aptitud','mf-ciudad'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.value='';
+  });
+  matFiltrar();
+}
+
+// ═══ ECNT CONFIG ═══
+function renderTablaECNT(){
+  var el=document.getElementById('tabla-ecnt'); if(!el) return;
+  var map=getECNTMap(), keys=Object.keys(map);
+  if(!keys.length){ el.innerHTML='<div style="color:#aaa;font-size:12px;padding:8px">Sin códigos.</div>'; return; }
+  el.innerHTML='<table style="width:100%;border-collapse:collapse;font-size:11px">'
+    +'<tr style="background:#e8eef8"><th style="padding:5px 8px;color:#1556a0;font-size:10px">CIE-10</th><th style="padding:5px 8px;color:#1556a0;font-size:10px">Condición ECNT</th><th></th></tr>'
+    +keys.map(function(k,i){return '<tr style="background:'+(i%2?'#fff':'#f8fafd')+'"><td style="padding:4px 8px;font-family:monospace;font-weight:700;color:#1556a0">'+k+'</td><td style="padding:4px 8px;font-size:11px">'+map[k]+'</td><td style="padding:4px 6px;text-align:center"><button onclick="eliminarECNT(\'' +k+ '\')" style="background:none;border:none;cursor:pointer;color:#e74c3c;font-size:15px;font-weight:700;padding:0">&times;</button></td></tr>';}).join('')
+    +'</table>';
+}
+function agregarECNT(){
+  var cie=(document.getElementById('new-cie')||{value:''}).value.trim().toUpperCase();
+  var nom=(document.getElementById('new-ecnt-nombre')||{value:''}).value.trim();
+  if(!cie||!nom){showMsg('Ingresa CIE-10 y nombre.','warn');return;}
+  var map=getECNTMap(); map[cie]=nom;
+  try{localStorage.setItem('femo_ecnt_config',JSON.stringify(map));}catch(e){}
+  document.getElementById('new-cie').value='';
+  document.getElementById('new-ecnt-nombre').value='';
+  renderTablaECNT(); showMsg('\u2714 '+cie+' agregado.');
+}
+function eliminarECNT(cie){
+  var map=getECNTMap(); delete map[cie];
+  try{localStorage.setItem('femo_ecnt_config',JSON.stringify(map));}catch(e){}
+  renderTablaECNT();
+}
+function resetECNT(){
+  if(!confirm('\u00bfRestaurar lista ECNT?')) return;
+  try{localStorage.removeItem('femo_ecnt_config');}catch(e){}
+  renderTablaECNT(); showMsg('ECNT restaurada.');
+}
+
+</script>
+</body>
