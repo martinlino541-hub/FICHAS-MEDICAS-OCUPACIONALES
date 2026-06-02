@@ -1330,7 +1330,7 @@ def borrador_eliminar(cedula):
 # ─────────────────────────────────────────────
 #  ECNT CONFIG — guardar/cargar lista en Supabase
 # ─────────────────────────────────────────────
-ECNT_TABLE = "configuración_ecnt"
+ECNT_TABLE = "ecnt_config"
 
 @app.route("/api/ecnt/cargar", methods=["GET"])
 def ecnt_cargar():
